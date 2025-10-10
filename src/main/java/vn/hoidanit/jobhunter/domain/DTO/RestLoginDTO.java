@@ -1,16 +1,38 @@
 package vn.hoidanit.jobhunter.domain.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class RestLoginDTO {
+    @JsonProperty("access_token")
     private String accessToken;
 
-    public RestLoginDTO(String accessToken) {
-        this.accessToken = accessToken;
+    private UserLogin user;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserLogin {
+        private Long id;
+        private String email;
+        private String name;
+    
+        
     }
-    public String getAccessToken() {
-        return accessToken;
-    }
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserGetAccount{
+        private UserLogin user;
     }
     
 }
