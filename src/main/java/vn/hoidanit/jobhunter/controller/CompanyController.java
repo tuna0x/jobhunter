@@ -6,8 +6,9 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.DTO.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
 
 import java.net.http.HttpRequest;
 import java.util.List;
@@ -35,39 +36,51 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
-    private final CompanyService companyService;
+  private final CompanyService companyService;
 
     public CompanyController(CompanyService companyService) {
         this.companyService = companyService;
     }
-    @PostMapping("/companies")
-    public ResponseEntity<?> createCompany(@Valid @RequestBody Company newCompany) {
-        Company company = this.companyService.handleCreateCompany(newCompany);
-        return ResponseEntity.status(HttpStatus.CREATED).body(company);
-    }
 
     @GetMapping("/companies")
+    @ApiMessage("fetch all companies")
     public ResponseEntity<ResultPaginationDTO> getAllCompany(
-    @Filter Specification<Company> spec,Pageable pageable) {
+            @Filter Specification<Company> spec, Pageable pageable) {
 
-        ResultPaginationDTO curList=this.companyService.handleGetAllCompanies(spec,pageable);
-            return ResponseEntity.ok().body(curList);
+        return ResponseEntity.ok(this.companyService.handleGetAllCompaniesWithPaginate(spec, pageable));
+    }
+
+
+    @GetMapping("/companies/{id}")
+    public ResponseEntity<Company> getCompanyByID(@PathVariable long id) {
+        // TODO: process POST request
+        Company companyFound = this.companyService.handleGetCompanyByID(id);
+        if (companyFound == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(companyFound);
+    }
+
+    @PostMapping("/companies")
+    public ResponseEntity<Company> postCreateCompany(@Valid @RequestBody Company company) {
+        // TODO: process POST request
+        Company companyCreated = this.companyService.handleCreateCompany(company);
+        return ResponseEntity.status(HttpStatus.CREATED).body(companyCreated);
     }
 
     @PutMapping("/companies")
-    public ResponseEntity<Company> updateCompany( @RequestBody Company c) {
-        Company cur=this.companyService.handleUpdateCompany(c);
-        return ResponseEntity.ok().body(cur);
+    public ResponseEntity<Company> putUpdateCompany(@Valid @RequestBody Company company) {
+        // TODO: process POST request
+        Company companyUpdated = this.companyService.handleUpdateCompany(company);
+        return ResponseEntity.status(HttpStatus.OK).body(companyUpdated);
     }
-    
+
     @DeleteMapping("/companies/{id}")
-    public ResponseEntity<String> deleteCompany(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteCompanyByID(@PathVariable long id) {
+        // TODO: process POST request
         this.companyService.handleDeleteCompany(id);
-        return ResponseEntity.ok().body("Company with ID " + id + " has been deleted.");
+        return ResponseEntity.ok(null);
     }
-    
-
-
 
 
 

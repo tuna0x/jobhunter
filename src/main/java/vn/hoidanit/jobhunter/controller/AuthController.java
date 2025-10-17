@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.DTO.LoginDTO;
-import vn.hoidanit.jobhunter.domain.DTO.RestLoginDTO;
+import vn.hoidanit.jobhunter.domain.request.ReqLoginDTO;
+import vn.hoidanit.jobhunter.domain.response.RestLoginDTO;
 import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
+import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
-import vn.hoidanit.jobhunter.util.error.SecurityUtil;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +49,7 @@ public class AuthController {
 
 
     @PostMapping("/auth/login")
-    public ResponseEntity<RestLoginDTO> login(@Valid @RequestBody LoginDTO loginDTO){
+    public ResponseEntity<RestLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDTO){
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
     // xac thuc ng dung
     Authentication authentication=authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -91,6 +92,7 @@ public class AuthController {
 
 
     @GetMapping("/auth/account")
+    @ApiMessage("Fetch account")
     public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
         String email=SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         User curUser=this.userService.handleGetUserByUsername(email);
@@ -108,6 +110,7 @@ public class AuthController {
 
 
         @GetMapping("/auth/refresh")
+         @ApiMessage("Get user by refresh token")
     public ResponseEntity<RestLoginDTO> getRefreshToken(@CookieValue(name="refresh_token",defaultValue = "") String refresh_token) throws IdInvalidException{
         if (refresh_token.equals("")) {
             throw new IdInvalidException("ko co refresh token");
