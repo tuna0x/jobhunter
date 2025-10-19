@@ -45,6 +45,17 @@ public class Permission {
     private String createdBy;
     private String updatedBy;
 
+
+    public Permission(@NotBlank(message = "Name is not blank") String name,
+            @NotBlank(message = "API Path is not blank") String apiPath,
+            @NotBlank(message = "Method is not blank") String method,
+            @NotBlank(message = "Module is not blank") String module) {
+        this.name = name;
+        this.apiPath = apiPath;
+        this.method = method;
+        this.module = module;
+    }
+
     @ManyToMany(fetch = FetchType.LAZY,mappedBy = "permissions")
     @JsonIgnore
     private List<Role> roles;
