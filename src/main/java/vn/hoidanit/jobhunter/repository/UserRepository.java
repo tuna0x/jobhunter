@@ -12,13 +12,11 @@ import vn.hoidanit.jobhunter.domain.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long>,JpaSpecificationExecutor<User> {
+    User findByEmail(String email);
 
-   public Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 
-    public boolean existsByEmail(String email);
-
-    Optional<User> findByRefreshTokenAndEmail(String refreshToken, String email);
+    User findByRefreshTokenAndEmail(String token, String email);
 
     List<User> findByCompany(Company company);
-} 
-    
+}

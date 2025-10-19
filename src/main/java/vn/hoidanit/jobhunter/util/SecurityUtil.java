@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.nimbusds.jose.util.Base64;
 
 import vn.hoidanit.jobhunter.domain.response.RestLoginDTO;
+import vn.hoidanit.jobhunter.domain.response.RestLoginDTO.UserInsideToken;
 
 
 @Service
@@ -50,23 +51,26 @@ public class SecurityUtil {
 
 
 
-   public String createAccessToken(String email,RestLoginDTO.UserLogin dto) {
+   public String createAccessToken(String email,RestLoginDTO dto) {
+    RestLoginDTO.UserInsideToken userInsideToken=new UserInsideToken();
+    userInsideToken.setId(dto.getUser().getId());
+    userInsideToken.setName(dto.getUser().getName());
+    userInsideToken.setEmail(dto.getUser().getEmail());
 
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
-        
+
         //hardcode permission
         List<String> listAuthority=new ArrayList<String>();
 
         listAuthority.add("ROLE_USER_CREATE");
         listAuthority.add("ROLE_USER_UPDATE");
-        
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(email)
-            .claim("user", dto)
+            .claim("user", userInsideToken)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -74,17 +78,21 @@ public class SecurityUtil {
     }
 
     public String refreshToken(String email,RestLoginDTO dto) {
+         RestLoginDTO.UserInsideToken userInsideToken=new UserInsideToken();
+    userInsideToken.setId(dto.getUser().getId());
+    userInsideToken.setName(dto.getUser().getName());
+    userInsideToken.setEmail(dto.getUser().getEmail());
 
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
-    
+
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(email)
-            .claim("user", dto.getUser())
+            .claim("user", userInsideToken)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

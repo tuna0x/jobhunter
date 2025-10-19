@@ -91,4 +91,8 @@ public class ResumeController {
     }
 
 
+    @PostMapping("/resumes/by-user")
+    public ResponseEntity<ResultPaginationDTO> getResumeByUser(Pageable pageable){
+        return ResponseEntity.ok().body(this.resumeService.getResumeByUser(pageable));
+    }
 }

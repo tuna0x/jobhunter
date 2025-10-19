@@ -52,13 +52,13 @@ public class CompanyController {
 
 
     @GetMapping("/companies/{id}")
-    public ResponseEntity<Company> getCompanyByID(@PathVariable long id) {
+    public ResponseEntity<Company> getCompanyByID(@PathVariable("id") long id) {
         // TODO: process POST request
         Company companyFound = this.companyService.handleGetCompanyByID(id);
         if (companyFound == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(companyFound);
+        return ResponseEntity.ok().body(companyFound);
     }
 
     @PostMapping("/companies")

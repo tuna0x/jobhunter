@@ -10,11 +10,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.response.job.ResCreateJobDTO;
 import vn.hoidanit.jobhunter.domain.response.job.ResUpdateJobDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
@@ -23,6 +25,7 @@ import vn.hoidanit.jobhunter.repository.SkillRepository;
 public class JobService {
     private final JobRepository jobRepository;
     private final SkillRepository SkillRepository;
+    private final CompanyRepository companyRepository;
 
 
     public ResCreateJobDTO handleCreateJob(Job newJob){
@@ -32,7 +35,14 @@ public class JobService {
 
             List<Skill> dbSkills=this.SkillRepository.findByIdIn(reqSkills);
             newJob.setSkills(dbSkills);
-            
+
+        }
+        // check company
+        if (newJob.getCompany()!= null) {
+            Optional<Company> jobOptional=this.companyRepository.findById(newJob.getCompany().getId());
+            if (jobOptional.isPresent()) {
+                newJob.setCompany(jobOptional.get());
+            }
         }
         Job job= this.jobRepository.save(newJob);
         ResCreateJobDTO resCreateJobDTO=new ResCreateJobDTO();
@@ -58,18 +68,37 @@ public class JobService {
         }
 
         return resCreateJobDTO;
-        
+
     }
 
-    public ResUpdateJobDTO handleUpdateJob(Job job){
+    public ResUpdateJobDTO handleUpdateJob(Job job,Job curInDTB){
           if (job.getSkills()!=null) {
             List<Long> reqSkills=job.getSkills().stream().map(skill->skill.getId())
             .collect(Collectors.toList());
 
             List<Skill> dbSkills=this.SkillRepository.findByIdIn(reqSkills);
-            job.setSkills(dbSkills);
-            
+            curInDTB.setSkills(dbSkills);
+
         }
+        if (job.getCompany()!= null) {
+            Optional<Company> jobOptional=this.companyRepository.findById(job.getCompany().getId());
+            if (jobOptional.isPresent()) {
+                curInDTB.setCompany(jobOptional.get());
+            }
+        }
+
+        //update correct info
+        curInDTB.setName( job.getName());
+        curInDTB.setLocation( job.getLocation());
+        curInDTB.setSalary( job.getSalary());
+        curInDTB.setQuantity( job.getQuantity());
+        curInDTB.setLevel( job.getLevel());
+        curInDTB.setDescription( job.getDescription());
+        curInDTB.setStartDate( job.getStartDate());
+        curInDTB.setEndDate( job.getEndDate());
+        curInDTB.setActive( job.isActive());
+
+        //update job
         Job curJob= this.jobRepository.save(job);
         ResUpdateJobDTO resUpdateJobDTO=new ResUpdateJobDTO();
         resUpdateJobDTO.setId(curJob.getId());

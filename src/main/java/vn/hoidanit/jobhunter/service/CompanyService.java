@@ -47,24 +47,6 @@ public class CompanyService {
         return rs;
     }
 
-    // public ResultPaginationDTO handleGetAllCompaniesWithPaginate(Pageable
-    // pageable) {
-    // // Page<Company> pageCompany = this.companyRepository.findAll(pageable);
-    // Page<Company> pageCompany = this.companyRepository.findAll(pageable);
-    // ResultPaginationDTO rs = new ResultPaginationDTO();
-    // Meta metaData = new Meta();
-
-    // metaData.setPage(pageCompany.getNumber() + 1);
-    // metaData.setPageSize(pageCompany.getSize());
-
-    // metaData.setPages(pageCompany.getTotalPages());
-    // metaData.setTotal(pageCompany.getTotalElements());
-
-    // rs.setMeta(metaData);
-    // rs.setResult(pageCompany.getContent());
-
-    // return rs;
-    // }
 
     public Company handleGetCompanyByID(long id) {
         Optional<Company> companyOptional = this.companyRepository.findById(id);
@@ -103,5 +85,5 @@ public class CompanyService {
         return this.companyRepository.findById(id);
     }
 
-    
+
 }

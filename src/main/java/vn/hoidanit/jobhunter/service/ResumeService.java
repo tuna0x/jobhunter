@@ -5,10 +5,16 @@ import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import com.turkraft.springfilter.converter.FilterSpecification;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
+import com.turkraft.springfilter.parser.FilterParser;
+import com.turkraft.springfilter.parser.node.FilterNode;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Job;
@@ -21,6 +27,7 @@ import vn.hoidanit.jobhunter.domain.response.resume.ResUpdateResumeDTO;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.ResumeRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
 
 @Service
 public class ResumeService {
@@ -28,6 +35,12 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
+
+    @Autowired
+    private FilterParser filterParser;
+    @Autowired
+    private FilterSpecificationConverter filterSpecificationConverter;
+
     public ResumeService(ResumeRepository resumeRepository, UserRepository userRepository, JobRepository jobRepository) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
@@ -94,6 +107,10 @@ public class ResumeService {
         resResumeDTO.setUpdatedAt(resume.getUpdatedAt());
         resResumeDTO.setUpdatedBy(resume.getUpdatedBy());
 
+        if (resume.getJob()!=null) {
+            resResumeDTO.setCompanyName(resume.getJob().getCompany().getName());
+        }
+
         resResumeDTO.setUser(new ResResumeDTO.UserResume(resume.getUser().getId(), resume.getUser().getName()));
         resResumeDTO.setJob(new ResResumeDTO.JobResume(resume.getJob().getId(), resume.getJob().getName()));
         return resResumeDTO;
@@ -119,6 +136,28 @@ public class ResumeService {
         .collect(Collectors.toList());
 
         rs.setData(listResume);
+        return rs;
+    }
+
+    public ResultPaginationDTO getResumeByUser(Pageable pageable) {
+        //query builder
+        String email =SecurityUtil.getCurrentUserLogin().isPresent()==true ?SecurityUtil.getCurrentUserLogin().get():"";
+        FilterNode node= filterParser.parse("email='"+email+"'");
+        FilterSpecification<Resume> spec=filterSpecificationConverter.convert(node);
+        Page<Resume> page=this.resumeRepository.findAll(spec,pageable);
+
+        ResultPaginationDTO rs =new ResultPaginationDTO();
+        ResultPaginationDTO.Meta metaData=new ResultPaginationDTO.Meta();
+
+        metaData.setPage(pageable.getPageNumber() + 1);
+        metaData.setPageSize(pageable.getPageSize());
+
+        metaData.setPages(page.getTotalPages());
+        metaData.setTotal(page.getTotalElements());
+
+        rs.setMeta(metaData);
+        rs.setData(page.getContent());
+
         return rs;
     }
 

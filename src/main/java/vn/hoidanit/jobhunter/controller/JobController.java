@@ -52,14 +52,14 @@ public class JobController {
         if (curJob==null) {
             throw new IdInvalidException("Job not found");
         }
-        
-        return ResponseEntity.ok().body(this.jobService.handleUpdateJob(job));
+
+        return ResponseEntity.ok().body(this.jobService.handleUpdateJob(job,curJob));
     }
 
     @GetMapping("/jobs")
     public ResponseEntity<ResultPaginationDTO> getAllJob(@Filter Specification<Job> spec, Pageable pageable){
         return ResponseEntity.ok().body(this.jobService.handleGetAllJobWithPaginate(spec, pageable));
- 
+
 }
 
     @GetMapping("/jobs/{id}")
@@ -68,7 +68,7 @@ public class JobController {
         if (job==null) {
             throw new IdInvalidException("Job not found");
         }
-        
+
         return ResponseEntity.ok().body(job);
     }
 

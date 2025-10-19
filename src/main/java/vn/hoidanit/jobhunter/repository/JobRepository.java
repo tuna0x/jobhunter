@@ -12,4 +12,4 @@ public interface JobRepository extends JpaRepository<Job,Long>,JpaSpecificationE
 
     public boolean existsByName(String name);
     public Job getJobById(Long id);
-} 
+}
