@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.RoleService;
@@ -34,55 +35,57 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/roles")
-    @ApiMessage("Create new role")
-    public ResponseEntity<Role> createnewRole(@RequestBody Role role) throws IdInvalidException {
-        //check name
-        // boolean check=this.roleService.existByName(role.getName());
-        // if (check) {
-        //     throw new IdInvalidException("role is exist");
-        // }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.create(role));
+     @PostMapping("/roles")
+    @ApiMessage("Create a role")
+    public ResponseEntity<Role> create(@Valid @RequestBody Role r) throws IdInvalidException {
+        // check exist
+        if (this.roleService.existByName(r.getName())) {
+            throw new IdInvalidException("Role with name " + r.getName() + " is exists already");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.create(r));
     }
 
     @PutMapping("/roles")
-    @ApiMessage("Update role")
-    public ResponseEntity<Role> updateRoles(@RequestBody Role role) throws IdInvalidException {
-
-        if (this.roleService.getById(role.getId())==null) {
-            throw new IdInvalidException("role is exist");
+    @ApiMessage("Update a role")
+    public ResponseEntity<Role> update(@Valid @RequestBody Role r) throws IdInvalidException {
+        if (this.roleService.fetchById(r.getId()) == null) {
+            throw new IdInvalidException("Role with id = " + r.getId() + " is not exist");
         }
-        // if (this.roleService.existByName(role.getName())) {
-        //     throw new IdInvalidException("role name is exist");
+        // check exist
+        // if (this.roleService.existByName(r.getName())) {
+        // throw new IdInvalidException("Role with name " + r.getName() + " is exists
+        // already");
         // }
-        return ResponseEntity.ok().body(this.roleService.update(role));
+        return ResponseEntity.ok().body(this.roleService.update(r));
     }
 
     @DeleteMapping("/roles/{id}")
-    @ApiMessage("Delete role by id")
-    public ResponseEntity<Void> deleteRoles(@PathVariable("id") Long id) throws IdInvalidException {
-        if (this.roleService.getById(id)==null) {
-            throw new IdInvalidException("role is not exist");
+    @ApiMessage("Delete a role")
+    public ResponseEntity<Void> update(@PathVariable("id") long id) throws IdInvalidException {
+        // check exist
+        if (this.roleService.fetchById(id) == null) {
+            throw new IdInvalidException("Role with id = " + id + " is not exist");
         }
         this.roleService.delete(id);
         return ResponseEntity.ok().body(null);
     }
 
     @GetMapping("/roles")
-    @ApiMessage("Get all roles")
-    public ResponseEntity<ResultPaginationDTO> getAllRoles(@Filter Specification<Role> spec,Pageable pageable) {
-        return ResponseEntity.ok().body(this.roleService.getAllRoles(spec, pageable));
+    @ApiMessage("Fetch all role")
+    public ResponseEntity<ResultPaginationDTO> getAll(
+            @Filter Specification<Role> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.roleService.getAll(spec, pageable));
     }
 
-    @GetMapping("/role{id}")
-    @ApiMessage("Get by Id")
-    public ResponseEntity<Role> getById(@PathVariable ("id") Role role) throws IdInvalidException {
-        Role cur=this.roleService.getById(role.getId());
-        if (cur!=null) {
-            throw new IdInvalidException("role is not exist");
+    @GetMapping("/roles/{id}")
+    @ApiMessage("Get a role by id")
+    public ResponseEntity<Role> getRoleById(@PathVariable("id") Long id) throws IdInvalidException {
+
+        Role currentRole = this.roleService.fetchById(id);
+        if (currentRole == null) {
+            throw new IdInvalidException("Role with id " + id + " not found");
         }
-        return ResponseEntity.ok().body(cur);
+        return ResponseEntity.ok(currentRole);
     }
-
 }

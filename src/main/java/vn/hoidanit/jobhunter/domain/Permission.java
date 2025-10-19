@@ -45,7 +45,7 @@ public class Permission {
     private String createdBy;
     private String updatedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY,mappedBy = "permission")
+    @ManyToMany(fetch = FetchType.LAZY,mappedBy = "permissions")
     @JsonIgnore
     private List<Role> roles;
 

@@ -33,66 +33,54 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/api/v1")
 
 public class PermissionController {
-    private final PermissionSerVice permissionSerVice;
+    private final PermissionSerVice permissionService;
     public PermissionController(PermissionSerVice permissionSerVice) {
-        this.permissionSerVice = permissionSerVice;
+        this.permissionService = permissionSerVice;
     }
 
-    @PostMapping("/permissions")
-    @ApiMessage("Create new permission")
-    public ResponseEntity<Permission> createNewPermission(@Valid @RequestBody Permission permission) throws IdInvalidException{
-        //check exist
-        if (this.permissionSerVice.isPermissionExist(permission)) {
-            throw new IdInvalidException("Permission is exist");
+  @PostMapping("/permissions")
+    @ApiMessage("Create a permission")
+    public ResponseEntity<Permission> create(@Valid @RequestBody Permission p) throws IdInvalidException {
+        // check exist
+        if (this.permissionService.isPermissionExist(p)) {
+            throw new IdInvalidException("Permission is exists already");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionSerVice.create(permission));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionService.create(p));
     }
 
     @PutMapping("/permissions")
-    @ApiMessage("Update permission by id")
-    public ResponseEntity<Permission> updatePermission(@RequestBody Permission permission) throws IdInvalidException{
-        //check exist by id
-        if (this.permissionSerVice.getById(permission.getId())==null) {
-            throw new IdInvalidException("Permission id is not exist");
+    @ApiMessage("Update a permission")
+    public ResponseEntity<Permission> update(@Valid @RequestBody Permission p) throws IdInvalidException {
+        if (this.permissionService.fetchById(p.getId()) == null) {
+            throw new IdInvalidException("Permission with id = " + p.getId() + " is not exist");
         }
-
-        //check exist by module, apiPath, method
-        if (this.permissionSerVice.isPermissionExist(permission)) {
-            //check name
-            if (this.permissionSerVice.isSameName(permission)) {
-                throw new IdInvalidException("Permission is exist");
+        // check exist module, apiPath, method
+        if (this.permissionService.isPermissionExist(p)) {
+            if (this.permissionService.isSameName(p)) {
+                throw new IdInvalidException("Permission is exists already (module/apiPath/method)");
             }
         }
 
-        return ResponseEntity.ok().body(this.permissionSerVice.update(permission));
+        return ResponseEntity.ok().body(this.permissionService.update(p));
     }
 
     @DeleteMapping("/permissions/{id}")
-    @ApiMessage("Delete permission by id")
-    public ResponseEntity<Void> deletePermission(@PathVariable("id") Long id) throws IdInvalidException{
-        //check exist by id
-        Permission permissionDB=this.permissionSerVice.getById(id);
-        if (permissionDB==null) {
-            throw new IdInvalidException("Permission id is not exist");
+    @ApiMessage("Delete a permission")
+    public ResponseEntity<Void> update(@PathVariable("id") long id) throws IdInvalidException {
+        // check exist
+        if (this.permissionService.fetchById(id) == null) {
+            throw new IdInvalidException("Permission with id = " + id + " is not exist");
         }
-        this.permissionSerVice.delete(id);
+        this.permissionService.delete(id);
         return ResponseEntity.ok().body(null);
     }
 
     @GetMapping("/permissions")
-    public ResponseEntity<ResultPaginationDTO> getPermission(@Filter Specification<Permission> spec,Pageable pageable){ {
-        return ResponseEntity.ok().body(this.permissionSerVice.getAllPermission(spec,pageable));
+    @ApiMessage("Fetch all permission")
+    public ResponseEntity<ResultPaginationDTO> getAll(
+            @Filter Specification<Permission> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.permissionService.getAll(spec, pageable));
     }
-}
-
-    @GetMapping("/permissions/{id}")
-    public ResponseEntity<Permission> getPermissionById(@PathVariable("id") Long id) throws IdInvalidException{
-        Permission permissionDB=this.permissionSerVice.getById(id);
-        if (permissionDB==null) {
-            throw new IdInvalidException("Permission id is not exist");
-        }
-        return ResponseEntity.ok().body(permissionDB);
-    }
-
 
 }

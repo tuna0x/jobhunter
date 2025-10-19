@@ -9,6 +9,7 @@ import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
+import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import java.net.http.HttpRequest;
 import java.util.List;
@@ -42,47 +43,43 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
+      @PostMapping("/companies")
+    @ApiMessage("Create a company")
+    public ResponseEntity<Company> createCompany(@Valid @RequestBody Company company) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.companyService.handleCreateCompany(company));
+    }
+
     @GetMapping("/companies")
-    @ApiMessage("fetch all companies")
-    public ResponseEntity<ResultPaginationDTO> getAllCompany(
-            @Filter Specification<Company> spec, Pageable pageable) {
+    @ApiMessage("Fetch all company")
+    public ResponseEntity<ResultPaginationDTO> getAllCompanies(
+            @Filter Specification<Company> spec,
+            Pageable pageable) {
 
-        return ResponseEntity.ok(this.companyService.handleGetAllCompaniesWithPaginate(spec, pageable));
-    }
-
-
-    @GetMapping("/companies/{id}")
-    public ResponseEntity<Company> getCompanyByID(@PathVariable("id") long id) {
-        // TODO: process POST request
-        Company companyFound = this.companyService.handleGetCompanyByID(id);
-        if (companyFound == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        return ResponseEntity.ok().body(companyFound);
-    }
-
-    @PostMapping("/companies")
-    public ResponseEntity<Company> postCreateCompany(@Valid @RequestBody Company company) {
-        // TODO: process POST request
-        Company companyCreated = this.companyService.handleCreateCompany(company);
-        return ResponseEntity.status(HttpStatus.CREATED).body(companyCreated);
+        return ResponseEntity.ok().body(this.companyService.handleGetAllCompanies(spec, pageable));
     }
 
     @PutMapping("/companies")
-    public ResponseEntity<Company> putUpdateCompany(@Valid @RequestBody Company company) {
-        // TODO: process POST request
-        Company companyUpdated = this.companyService.handleUpdateCompany(company);
-        return ResponseEntity.status(HttpStatus.OK).body(companyUpdated);
+    @ApiMessage("Update a company")
+    public ResponseEntity<Company> UpdateCompany(@Valid @RequestBody Company company) {
+        return ResponseEntity.ok().body(this.companyService.handleUpdateCompany(company));
     }
 
     @DeleteMapping("/companies/{id}")
-    public ResponseEntity<Void> deleteCompanyByID(@PathVariable long id) {
-        // TODO: process POST request
+    @ApiMessage("Delete a company by id")
+    public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
         this.companyService.handleDeleteCompany(id);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().body(null);
     }
 
+    @GetMapping("/companies/{id}")
+    @ApiMessage("Fetch a company by id")
+    public ResponseEntity<Company> fetchById(@PathVariable("id") long id) throws IdInvalidException {
 
-
-    
+        // Check id
+        Optional<Company> companyOptional = this.companyService.fetchById(id);
+        if (companyOptional == null) {
+            throw new IdInvalidException("Resume with Id: " + id + " is not exist !");
+        }
+        return ResponseEntity.ok().body(companyOptional.get());
+    }
 }

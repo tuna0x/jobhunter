@@ -21,138 +21,145 @@ import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
 @Service
-@AllArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
-    private final SkillRepository SkillRepository;
+    private final SkillRepository skillRepository;
     private final CompanyRepository companyRepository;
 
+     public JobService(JobRepository jobRepository, SkillRepository skillRepository,
+            CompanyRepository companyRepository) {
+        this.jobRepository = jobRepository;
+        this.skillRepository = skillRepository;
+        this.companyRepository = companyRepository;
+    }
 
-    public ResCreateJobDTO handleCreateJob(Job newJob){
-        if (newJob.getSkills()!=null) {
-            List<Long> reqSkills=newJob.getSkills().stream().map(skill->skill.getId())
-            .collect(Collectors.toList());
-
-            List<Skill> dbSkills=this.SkillRepository.findByIdIn(reqSkills);
-            newJob.setSkills(dbSkills);
-
+    public ResCreateJobDTO handleCreateJob(Job job) {
+        // check skills
+        if (job.getSkills() != null) {
+            // Get list skill id - Long
+            List<Long> reqSkills = job.getSkills()
+                    .stream().map(x -> x.getId())
+                    .collect(Collectors.toList());
+            // Get list skill by Id
+            List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
+            job.setSkills(dbSkills);
         }
+
         // check company
-        if (newJob.getCompany()!= null) {
-            Optional<Company> jobOptional=this.companyRepository.findById(newJob.getCompany().getId());
-            if (jobOptional.isPresent()) {
-                newJob.setCompany(jobOptional.get());
+        if (job.getCompany() != null) {
+            Optional<Company> companyOptional = this.companyRepository.findById(job.getCompany().getId());
+            if (companyOptional.isPresent()) {
+                job.setCompany(companyOptional.get());
             }
         }
-        Job job= this.jobRepository.save(newJob);
-        ResCreateJobDTO resCreateJobDTO=new ResCreateJobDTO();
-        resCreateJobDTO.setId(job.getId());
-        resCreateJobDTO.setName(job.getName());
-        resCreateJobDTO.setLocation(job.getLocation());
-        resCreateJobDTO.setSalary(job.getSalary());
-        resCreateJobDTO.setQuantity(job.getQuantity());
-        resCreateJobDTO.setLevel(job.getLevel());
-        resCreateJobDTO.setDescription(job.getDescription());
-        resCreateJobDTO.setStartDate(job.getStartDate());
-        resCreateJobDTO.setEndDate(job.getEndDate());
-        resCreateJobDTO.setActive(job.isActive());
-        resCreateJobDTO.setCreatedAt(job.getCreatedAt());
-        resCreateJobDTO.setUpdatedAt(job.getUpdatedAt());
-        resCreateJobDTO.setCreatedBy(job.getCreatedBy());
-        resCreateJobDTO.setUpdatedBy(job.getUpdatedBy());
+        // Create job
+        Job currentJob = this.jobRepository.save(job);
 
-        if (job.getSkills()!=null) {
-            List<String> skills=job.getSkills().stream().map(skill->skill.getName())
-            .collect(Collectors.toList());
-            resCreateJobDTO.setSkills(skills);
+        // Convert response
+        ResCreateJobDTO dto = new ResCreateJobDTO();
+        dto.setId(currentJob.getId());
+        dto.setName(currentJob.getName());
+        dto.setLocation(currentJob.getLocation());
+        dto.setSalary(currentJob.getSalary());
+        dto.setQuantity(currentJob.getQuantity());
+        dto.setLevel(currentJob.getLevel());
+        dto.setStartDate(currentJob.getStartDate());
+        dto.setEndDate(currentJob.getEndDate());
+        dto.setActive(currentJob.isActive());
+        dto.setCreatedAt(currentJob.getCreatedAt());
+        dto.setCreatedBy(currentJob.getCreatedBy());
+
+        // Set skills for current job
+        if (currentJob.getSkills() != null) {
+            List<String> skills = currentJob.getSkills()
+                    .stream().map(s -> s.getName())
+                    .collect(Collectors.toList());
+            dto.setSkills(skills);
+
         }
-
-        return resCreateJobDTO;
-
+        return dto;
     }
 
-    public ResUpdateJobDTO handleUpdateJob(Job job,Job curInDTB){
-          if (job.getSkills()!=null) {
-            List<Long> reqSkills=job.getSkills().stream().map(skill->skill.getId())
-            .collect(Collectors.toList());
-
-            List<Skill> dbSkills=this.SkillRepository.findByIdIn(reqSkills);
-            curInDTB.setSkills(dbSkills);
-
-        }
-        if (job.getCompany()!= null) {
-            Optional<Company> jobOptional=this.companyRepository.findById(job.getCompany().getId());
-            if (jobOptional.isPresent()) {
-                curInDTB.setCompany(jobOptional.get());
-            }
-        }
-
-        //update correct info
-        curInDTB.setName( job.getName());
-        curInDTB.setLocation( job.getLocation());
-        curInDTB.setSalary( job.getSalary());
-        curInDTB.setQuantity( job.getQuantity());
-        curInDTB.setLevel( job.getLevel());
-        curInDTB.setDescription( job.getDescription());
-        curInDTB.setStartDate( job.getStartDate());
-        curInDTB.setEndDate( job.getEndDate());
-        curInDTB.setActive( job.isActive());
-
-        //update job
-        Job curJob= this.jobRepository.save(job);
-        ResUpdateJobDTO resUpdateJobDTO=new ResUpdateJobDTO();
-        resUpdateJobDTO.setId(curJob.getId());
-        resUpdateJobDTO.setName(curJob.getName());
-        resUpdateJobDTO.setLocation(curJob.getLocation());
-        resUpdateJobDTO.setSalary(curJob.getSalary());
-        resUpdateJobDTO.setQuantity(curJob.getQuantity());
-        resUpdateJobDTO.setLevel(curJob.getLevel());
-        resUpdateJobDTO.setDescription(curJob.getDescription());
-        resUpdateJobDTO.setStartDate(curJob.getStartDate());
-        resUpdateJobDTO.setEndDate(curJob.getEndDate());
-        resUpdateJobDTO.setActive(curJob.isActive());
-        resUpdateJobDTO.setCreatedAt(curJob.getCreatedAt());
-        resUpdateJobDTO.setUpdatedAt(curJob.getUpdatedAt());
-        resUpdateJobDTO.setCreatedBy(curJob.getCreatedBy());
-        resUpdateJobDTO.setUpdatedBy(curJob.getUpdatedBy());
-
-        if (curJob.getSkills()!=null) {
-            List<String> skills=curJob.getSkills().stream().map(skill->skill.getName())
-            .collect(Collectors.toList());
-            resUpdateJobDTO.setSkills(skills);
-        }
-
-        return resUpdateJobDTO;
-        }
-
-        public Job handleGetJobById(Long id){
-            Optional<Job> jobOptional=this.jobRepository.findById(id);
-            if (jobOptional.isPresent()) {
-                return jobOptional.get();
-            }
-            return null;
-        }
-
-         public ResultPaginationDTO handleGetAllJobWithPaginate(Specification<Job> spec, Pageable pageable) {
-        Page<Job> pageCompany = this.jobRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
-
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
-
-        metaData.setPages(pageCompany.getTotalPages());
-        metaData.setTotal(pageCompany.getTotalElements());
-
-        rs.setMeta(metaData);
-        rs.setData(pageCompany.getContent());
-
-        return rs;
+    public Optional<Job> fetchJobById(Long id) {
+        return this.jobRepository.findById(id);
     }
 
-        public void handleDeleteJob(Long id){
-            this.jobRepository.deleteById(id);
+    public ResUpdateJobDTO handleUpdateJob(Job job, Job jobInDB) {
+
+        // check skills
+        if (job.getSkills() != null) {
+            // Get list skill id - Long
+            List<Long> reqSkills = job.getSkills()
+                    .stream().map(x -> x.getId())
+                    .collect(Collectors.toList());
+            // Get list skill by Id
+            List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
+            jobInDB.setSkills(dbSkills);
         }
 
- 
+        // check company
+        if (job.getCompany() != null) {
+            Optional<Company> companyOpt = this.companyRepository.findById(job.getCompany().getId());
+            if (companyOpt.isPresent()) {
+                jobInDB.setCompany(companyOpt.get());
+            }
+        }
+        jobInDB.setName(job.getName());
+        jobInDB.setLocation(job.getLocation());
+        jobInDB.setSalary(job.getSalary());
+        jobInDB.setQuantity(job.getQuantity());
+        jobInDB.setLevel(job.getLevel());
+        jobInDB.setStartDate(job.getStartDate());
+        jobInDB.setEndDate(job.getEndDate());
+        jobInDB.setActive(job.isActive());
+
+        // Update job
+        Job currentJob = this.jobRepository.save(jobInDB);
+
+        // Convert response
+        ResUpdateJobDTO dto = new ResUpdateJobDTO();
+        dto.setId(currentJob.getId());
+        dto.setName(currentJob.getName());
+        dto.setLocation(currentJob.getLocation());
+        dto.setSalary(currentJob.getSalary());
+        dto.setQuantity(currentJob.getQuantity());
+        dto.setLevel(currentJob.getLevel());
+        dto.setStartDate(currentJob.getStartDate());
+        dto.setEndDate(currentJob.getEndDate());
+        dto.setActive(currentJob.isActive());
+        dto.setUpdatedAt(currentJob.getUpdatedAt());
+        dto.setUpdatedBy(currentJob.getUpdatedBy());
+
+        // Set skills for current job
+        if (currentJob.getSkills() != null) {
+            List<String> skills = currentJob.getSkills()
+                    .stream().map(s -> s.getName())
+                    .collect(Collectors.toList());
+            dto.setSkills(skills);
+
+        }
+        return dto;
+    }
+
+    public ResultPaginationDTO handleGetAllJob(Specification<Job> spec, Pageable pageable) {
+        Page<Job> pageJob = this.jobRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageJob.getNumber() + 1);
+        meta.setPageSize(pageJob.getSize());
+        meta.setPages(pageJob.getTotalPages());
+        meta.setTotal(pageJob.getTotalElements());
+
+        resultPaginationDTO.setMeta(meta);
+
+        resultPaginationDTO.setResult(pageJob.getContent());
+
+        return resultPaginationDTO;
+    }
+
+    public void deleteJob(Long id) {
+        this.jobRepository.deleteById(id);
+    }
+
+   
 }

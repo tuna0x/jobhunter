@@ -12,6 +12,7 @@ import vn.hoidanit.jobhunter.domain.response.resume.ResCreateResumeDTO;
 import vn.hoidanit.jobhunter.domain.response.resume.ResResumeDTO;
 import vn.hoidanit.jobhunter.domain.response.resume.ResUpdateResumeDTO;
 import vn.hoidanit.jobhunter.service.ResumeService;
+import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import java.lang.StackWalker.Option;
@@ -40,59 +41,68 @@ public class ResumeController {
         this.resumeService = resumeService;
     }
 
-    @PostMapping("/resumes")
-    public ResponseEntity<ResCreateResumeDTO> createNewResume(@Valid @RequestBody Resume resume) throws IdInvalidException{
-
-        boolean isIdExist=this.resumeService.checkResumeExistByUserAndJob(resume);
-        if (!isIdExist) {
-            throw new IdInvalidException("User and jov is not existed resume");
+   @PostMapping("/resumes")
+    @ApiMessage("Create a new resume")
+    public ResponseEntity<ResCreateResumeDTO> create(@Valid @RequestBody Resume resume) throws IdInvalidException {
+        // check user and job
+        boolean isExistID = this.resumeService.checkResumeExistByUserAndJob(resume);
+        if (!isExistID) {
+            throw new IdInvalidException("User ID/Job ID is not exist");
         }
-        ResCreateResumeDTO resCreateResumeDTO=this.resumeService.createNewResume(resume);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resCreateResumeDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.resumeService.create(resume));
     }
 
-    @PutMapping("resumes")
-    public ResponseEntity<ResUpdateResumeDTO> updateResume(@RequestBody Resume resume) throws IdInvalidException{
-        //check id exist
-        Optional<Resume> reOptional=this.resumeService.getResumeById(resume.getId());
-        if (!reOptional.isPresent()) {
-            throw new IdInvalidException("Resume id is not exist");
-        }
-        Resume resumeToUpdate=reOptional.get();
-        resumeToUpdate.setStatus(resume.getStatus());
+    @PutMapping("/resumes")
+    @ApiMessage("Update a resume")
+    public ResponseEntity<ResUpdateResumeDTO> update(@RequestBody Resume resume) throws IdInvalidException {
 
-        return ResponseEntity.ok().body(this.resumeService.updateResume(resumeToUpdate));
+        Optional<Resume> resumeOpt = this.resumeService.fetchByID(resume.getId());
+        if (resumeOpt.isEmpty()) {
+            throw new IdInvalidException("Resume with id :" + resume.getId() + " is not exist!");
+        }
+        Resume currentResume = resumeOpt.get();
+        currentResume.setStatus(resume.getStatus());
+        return ResponseEntity.ok().body(this.resumeService.update(currentResume));
     }
 
     @DeleteMapping("/resumes/{id}")
-    public ResponseEntity<Void> deleteResume(@PathVariable("id") Long id) throws IdInvalidException{
-        //check id exist
-        Optional<Resume> reOptional=this.resumeService.getResumeById(id);
-        if (!reOptional.isPresent()) {
-            throw new IdInvalidException("Resume id is not exist");
+    @ApiMessage("Delete a resume")
+    public ResponseEntity<Void> deleteSkill(@PathVariable("id") long id) throws IdInvalidException {
+        // Check id
+        Optional<Resume> resumeOptional = this.resumeService.fetchByID(id);
+        if (resumeOptional == null) {
+            throw new IdInvalidException("Resume with Id: " + id + " is not exist !");
         }
-        this.resumeService.deleteResume(id);
+
+        this.resumeService.delete(id);
         return ResponseEntity.ok().body(null);
     }
 
     @GetMapping("/resumes/{id}")
-    public ResponseEntity<ResResumeDTO> getResumeById(@PathVariable("id") Long id) throws IdInvalidException{
-        Optional<Resume> reOptional=this.resumeService.getResumeById(id);
-        if (!reOptional.isPresent()) {
-            throw new IdInvalidException("Resume id is not exist");
+    @ApiMessage("Fetch resume by id")
+    public ResponseEntity<ResResumeDTO> fetchById(@PathVariable("id") long id) throws IdInvalidException {
+
+        // Check id
+        Optional<Resume> resumeOptional = this.resumeService.fetchByID(id);
+        if (resumeOptional == null) {
+            throw new IdInvalidException("Resume with Id: " + id + " is not exist !");
         }
-        return ResponseEntity.ok().body(this.resumeService.getResumeById(reOptional.get()));
+        return ResponseEntity.ok().body(this.resumeService.getResume(resumeOptional.get()));
     }
 
     @GetMapping("/resumes")
-    public ResponseEntity<ResultPaginationDTO> getAllResume(@Filter Specification<Resume> spec, Pageable pageable){
-        return ResponseEntity.ok().body(this.resumeService.getAllResume(spec, pageable));
-
+    @ApiMessage("Fetch all resumes")
+    public ResponseEntity<ResultPaginationDTO> fetchAll(
+            @Filter Specification<Resume> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.resumeService.fetchAll(spec, pageable));
     }
 
-
     @PostMapping("/resumes/by-user")
-    public ResponseEntity<ResultPaginationDTO> getResumeByUser(Pageable pageable){
-        return ResponseEntity.ok().body(this.resumeService.getResumeByUser(pageable));
+    @ApiMessage("Get list resumes by user")
+    public ResponseEntity<ResultPaginationDTO> fetchResumeByUser(
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
     }
 }

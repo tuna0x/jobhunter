@@ -47,118 +47,121 @@ public class ResumeService {
         this.jobRepository = jobRepository;
     }
 
-    public ResCreateResumeDTO createNewResume(Resume resume) {
-        resume=this.resumeRepository.save(resume);
-        ResCreateResumeDTO resCreateResumeDTO=new ResCreateResumeDTO();
-        resCreateResumeDTO.setId(resume.getId());
-        resCreateResumeDTO.setCreatedAt(resume.getCreatedAt());
-        resCreateResumeDTO.setCreatedBy(resume.getCreatedBy());
+   public boolean checkResumeExistByUserAndJob(Resume resume) {
 
-        return resCreateResumeDTO;
-    }
-
-    public Optional<Resume> getResumeById(Long id) {
-        Optional<Resume> resume= this.resumeRepository.findById(id);
-        return resume;
-    }
-
-    public ResUpdateResumeDTO updateResume(Resume resume) {
-       Optional <Resume> reOptional=this.getResumeById(resume.getId());
-        if (reOptional.isPresent()) {
-            resume=this.resumeRepository.save(resume);
-            ResUpdateResumeDTO resUpdateResumeDTO=new ResUpdateResumeDTO();
-            resUpdateResumeDTO.setUpdatedAt(resume.getUpdatedAt());
-            resUpdateResumeDTO.setUpdatedBy(resume.getUpdatedBy());
-            return resUpdateResumeDTO;
-        }
-        return null;
-    }
-
-    public void deleteResume(Long id) {
-        this.resumeRepository.deleteById(id);
-    }
-
-    public boolean checkResumeExistByUserAndJob(Resume resume) {
-        if (resume.getUser()==null) {
+        // check user by id
+        if (resume.getUser() == null) {
             return false;
         }
-        Optional<User> userOptional=this.userRepository.findById(resume.getUser().getId());
-        if (userOptional.isEmpty()) {
+        Optional<User> userOpt = this.userRepository.findById(resume.getUser().getId());
+        if (userOpt.isEmpty()) {
             return false;
         }
 
-        if (resume.getJob()==null) {
+        // Check job
+        if (resume.getJob() == null) {
             return false;
         }
-        Optional<Job> jobOptional=this.jobRepository.findById(resume.getJob().getId());
-        if (jobOptional.isEmpty()) {
+        Optional<Job> jobOpt = this.jobRepository.findById(resume.getJob().getId());
+        if (jobOpt.isEmpty()) {
             return false;
         }
+
         return true;
     }
 
-    public ResResumeDTO getResumeById(Resume resume) {
-        ResResumeDTO resResumeDTO=new ResResumeDTO();
-        resResumeDTO.setId(resume.getId());
-        resResumeDTO.setEmail(resume.getEmail());
-        resResumeDTO.setStatus(resume.getStatus());
-        resResumeDTO.setCreatedAt(resume.getCreatedAt());
-        resResumeDTO.setCreatedBy(resume.getCreatedBy());
-        resResumeDTO.setUpdatedAt(resume.getUpdatedAt());
-        resResumeDTO.setUpdatedBy(resume.getUpdatedBy());
+    public ResCreateResumeDTO create(Resume resume) {
+        resume = this.resumeRepository.save(resume);
 
-        if (resume.getJob()!=null) {
-            resResumeDTO.setCompanyName(resume.getJob().getCompany().getName());
+        ResCreateResumeDTO res = new ResCreateResumeDTO();
+        res.setId(resume.getId());
+        res.setCreatedAt(resume.getCreatedAt());
+        res.setCreatedBy(resume.getCreatedBy());
+
+        return res;
+    }
+
+    public Optional<Resume> fetchByID(Long id) {
+        return this.resumeRepository.findById(id);
+    }
+
+    public ResUpdateResumeDTO update(Resume resume) {
+        resume = this.resumeRepository.save(resume);
+        ResUpdateResumeDTO res = new ResUpdateResumeDTO();
+        res.setUpdatedAt(resume.getUpdatedAt());
+        res.setUpdatedBy(resume.getUpdatedBy());
+        return res;
+    }
+
+    public void delete(long id) {
+        this.resumeRepository.deleteById(id);
+    }
+
+    public ResResumeDTO getResume(Resume resume) {
+        ResResumeDTO res = new ResResumeDTO();
+        res.setId(resume.getId());
+        res.setEmail(resume.getEmail());
+        res.setUrl(resume.getUrl());
+        res.setStatus(resume.getStatus());
+        res.setCreatedAt(resume.getCreatedAt());
+        res.setUpdatedAt(resume.getUpdatedAt());
+        res.setCreatedBy(resume.getCreatedBy());
+        res.setUpdatedBy(resume.getUpdatedBy());
+
+        if (resume.getJob() != null) {
+            res.setCompanyName(resume.getJob().getCompany().getName());
         }
-
-        resResumeDTO.setUser(new ResResumeDTO.UserResume(resume.getUser().getId(), resume.getUser().getName()));
-        resResumeDTO.setJob(new ResResumeDTO.JobResume(resume.getJob().getId(), resume.getJob().getName()));
-        return resResumeDTO;
+        res.setUser(new ResResumeDTO.UserResume(resume.getUser().getId(), resume.getUser().getName()));
+        res.setJob(new ResResumeDTO.JobResume(resume.getJob().getId(), resume.getJob().getName()));
+        return res;
     }
 
-    public ResultPaginationDTO getAllResume(Specification <Resume> spec, Pageable pageable) {
-        Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
+    public ResultPaginationDTO fetchAll(Specification<Resume> spec, Pageable pageable) {
+        Page<Resume> pageSkill = this.resumeRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageSkill.getNumber() + 1);
+        meta.setPageSize(pageSkill.getSize());
+        meta.setPages(pageSkill.getTotalPages());
+        meta.setTotal(pageSkill.getTotalElements());
 
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
+        resultPaginationDTO.setMeta(meta);
 
-        metaData.setPages(pageResume.getTotalPages());
-        metaData.setTotal(pageResume.getTotalElements());
+        List<ResResumeDTO> listResume = pageSkill.getContent()
+                .stream().map(item -> this.getResume(item))
+                .collect(Collectors.toList());
 
-        rs.setMeta(metaData);
+        resultPaginationDTO.setResult(listResume);
 
-        // remove sensitive data
-
-        List<ResResumeDTO> listResume=pageResume.getContent().stream()
-        .map(item->this.getResumeById(item))
-        .collect(Collectors.toList());
-
-        rs.setData(listResume);
-        return rs;
+        return resultPaginationDTO;
     }
 
-    public ResultPaginationDTO getResumeByUser(Pageable pageable) {
-        //query builder
-        String email =SecurityUtil.getCurrentUserLogin().isPresent()==true ?SecurityUtil.getCurrentUserLogin().get():"";
-        FilterNode node= filterParser.parse("email='"+email+"'");
-        FilterSpecification<Resume> spec=filterSpecificationConverter.convert(node);
-        Page<Resume> page=this.resumeRepository.findAll(spec,pageable);
+    public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+        // query builder
+        // Get email
+        String email = SecurityUtil.getCurrentUserLogin().isPresent()
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        FilterNode node = filterParser.parse("email='" + email + "'");
+        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
 
-        ResultPaginationDTO rs =new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData=new ResultPaginationDTO.Meta();
+        Page<Resume> pageSkill = this.resumeRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageSkill.getNumber() + 1);
+        meta.setPageSize(pageSkill.getSize());
+        meta.setPages(pageSkill.getTotalPages());
+        meta.setTotal(pageSkill.getTotalElements());
 
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
+        resultPaginationDTO.setMeta(meta);
 
-        metaData.setPages(page.getTotalPages());
-        metaData.setTotal(page.getTotalElements());
+        List<ResResumeDTO> listResume = pageSkill.getContent()
+                .stream().map(item -> this.getResume(item))
+                .collect(Collectors.toList());
 
-        rs.setMeta(metaData);
-        rs.setData(page.getContent());
+        resultPaginationDTO.setResult(listResume);
 
-        return rs;
+        return resultPaginationDTO;
     }
 
 }

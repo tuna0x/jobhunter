@@ -51,64 +51,57 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+ @PostMapping("/users")
+    @ApiMessage("Create a new user")
+    public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User userinput) throws IdInvalidException {
+        boolean isEmailExist = this.userService.isEmailExist(userinput.getEmail());
+
+        if (isEmailExist) {
+            throw new IdInvalidException("Email " + userinput.getEmail() + " is exist, please input another email!");
+        }
+
+        String hashPassword = this.passwordEncoder.encode(userinput.getPassword());
+        userinput.setPassword(hashPassword);
+        User newUser = this.userService.handleCreateUser(userinput);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.ConvertToResCreateDTO(newUser));
+    }
 
     @GetMapping("/users")
-    @ApiMessage("fetch all users")
+    @ApiMessage("Fetch all user")
     public ResponseEntity<ResultPaginationDTO> getAllUsers(
-            @Filter Specification<User> spec, Pageable pageable) {
-
-                ResultPaginationDTO resultPaginationDTO = this.userService.handleGetAllUsersWithPaginate(spec, pageable);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resultPaginationDTO);
+            @Filter Specification<User> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok(this.userService.handleGetAllUser(spec, pageable));
     }
 
     @GetMapping("/users/{id}")
-    @ApiMessage("fetch user by id")
-    public ResponseEntity<ResUserDTO> getUserByID(@PathVariable("id") long id) throws IdInvalidException {
-        User user = this.userService.handleFetchUserByID(id);
-        if (user == null) {
-            throw new IdInvalidException("Cannot find user with id " + id);
+    public ResponseEntity<ResUserDTO> getUserByID(@PathVariable("id") Long id) throws IdInvalidException {
+        User currentUser = this.userService.fetchUserById(id);
+        if (currentUser == null) {
+            throw new IdInvalidException("User with ID = " + id + " do not exist!");
         }
-        this.userService.convertResGetUserDTO(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertResGetUserDTO(user));
-    }
-
-    @PostMapping("/users")
-    @ApiMessage("Create a new user")
-    public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User user)
-            throws IdInvalidException {
-
-        boolean isExist = this.userService.isEmailExist(user.getEmail());
-        if (isExist) {
-            throw new IdInvalidException("Email " + user.getEmail() + " is already exist.");
-        }
-
-        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-        User userCreated = this.userService.handleCreateUser(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResCreatedUserDTO(userCreated));
+        return ResponseEntity.ok(this.userService.ConvertToResUserDTO(currentUser));
     }
 
     @PutMapping("/users")
     public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User user) throws IdInvalidException {
-
-        User userUpdated = this.userService.handleUpdateUser(user);
-
-        if (userUpdated == null) {
-            throw new IdInvalidException("Cannot update user with id " + user.getId());
+        User updateUser = this.userService.handleUpdateUser(user);
+        if (updateUser == null) {
+            throw new IdInvalidException("User with ID = " + user.getId() + " do not exist!");
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertResUpdatedUserDTO(userUpdated));
+        return ResponseEntity.ok().body(this.userService.ConvertToResUpdateUserDTO(updateUser));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUserByID(@PathVariable("id") long id) throws IdInvalidException {
-
-        boolean isExist = this.userService.handleFetchUserByID(id) != null;
-        if (!isExist) {
-            throw new IdInvalidException("Cannot delete user with id " + id);
+    @ApiMessage("Delete a user")
+    public ResponseEntity<Void> deletUser(@PathVariable("id") long id) throws IdInvalidException {
+        User currentUser = this.userService.fetchUserById(id);
+        if (currentUser == null) {
+            throw new IdInvalidException("User with ID = " + id + " do not exist!");
         }
+
         this.userService.handleDeleteUser(id);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok(null);
     }
+
 }

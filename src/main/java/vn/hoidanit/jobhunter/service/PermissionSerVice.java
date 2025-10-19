@@ -24,68 +24,73 @@ public class PermissionSerVice {
         this.permissionRepository = permissionRepository;
     }
 
-    public boolean isPermissionExist(Permission permission) {
-        return permissionRepository.existsByModuleAndApiPathAndMethod(permission.getModule(), permission.getApiPath(), permission.getMethod());
+        public boolean isPermissionExist(Permission p) {
+        return this.permissionRepository.existsByModuleAndApiPathAndMethod(
+                p.getModule(),
+                p.getApiPath(),
+                p.getMethod());
+    }
+
+    public boolean isSameName(Permission p) {
+        Permission permissionDB = this.fetchById(p.getId());
+        if (permissionDB != null) {
+            if (permissionDB.getName().equals(p.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Permission create(Permission permission) {
         return this.permissionRepository.save(permission);
     }
 
-    public Permission update(Permission permission) {
-        Permission permissionDB=this.getById(permission.getId());
-        if (permissionDB!=null) {
-            permissionDB.setName(permission.getName());
-            permissionDB.setModule(permission.getModule());
-            permissionDB.setApiPath(permission.getApiPath());
-            permissionDB.setMethod(permission.getMethod());
-            permissionDB=this.permissionRepository.save(permissionDB);
+    public Permission fetchById(long id) {
+        Optional<Permission> p = this.permissionRepository.findById(id);
+        if (p.isPresent()) {
+            return p.get();
+        }
+        return null;
+    }
+
+    public Permission update(Permission p) {
+        Permission permissionDB = this.fetchById(p.getId());
+        if (permissionDB != null) {
+            permissionDB.setName(p.getName());
+            permissionDB.setApiPath(p.getApiPath());
+            permissionDB.setMethod(p.getMethod());
+            permissionDB.setModule(p.getModule());
+
+            permissionDB = this.permissionRepository.save(permissionDB);
             return permissionDB;
         }
         return null;
     }
 
-    public Permission getById(Long id) {
-        Optional<Permission> permission = this.permissionRepository.findById(id);
-        if (permission.isPresent()) {
-            return permission.get();
+    public void delete(long id) {
+        // Delete permission_role
+        Optional<Permission> permissionOpt = this.permissionRepository.findById(id);
+        Permission currentP = permissionOpt.get();
+        if (currentP.getRoles() != null) {
+            currentP.getRoles().forEach(role -> role.getPermissions().remove(currentP));
         }
-        return null;
+        // Delete permission
+        this.permissionRepository.delete(currentP);
     }
 
-    public void delete(Long id) {
-        // delete permission_role
-        Optional<Permission> permissioOptional=this.permissionRepository.findById(null);
-        Permission cuPermission=permissioOptional.get();
-        cuPermission.getRoles().forEach(role->role.getPermission().remove(cuPermission.getRoles()));
+    public ResultPaginationDTO getAll(Specification<Permission> spec, Pageable pageable) {
+        Page<Permission> pagePermission = this.permissionRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pagePermission.getNumber() + 1);
+        meta.setPageSize(pagePermission.getSize());
+        meta.setPages(pagePermission.getTotalPages());
+        meta.setTotal(pagePermission.getTotalElements());
 
-        //delete permission
-        this.permissionRepository.delete(cuPermission);
-    }
+        resultPaginationDTO.setMeta(meta);
 
-    public ResultPaginationDTO getAllPermission(Specification<Permission> spec, Pageable pageable) {
-         Page<Permission> pagePer = this.permissionRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
+        resultPaginationDTO.setResult(pagePermission.getContent());
 
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
-
-        metaData.setPages(pagePer.getTotalPages());
-        metaData.setTotal(pagePer.getTotalElements());
-
-        rs.setMeta(metaData);
-        rs.setData(pagePer.getContent());
-        return rs;
-    }
-
-    public boolean isSameName(Permission permission) {
-        Permission perInDB=this.getById(permission.getId());
-        if (perInDB!=null) {
-            if (perInDB.getName().equals(permission.getName())) {
-                return true;
-            }
-        }
-        return false;
+        return resultPaginationDTO;
     }
 }

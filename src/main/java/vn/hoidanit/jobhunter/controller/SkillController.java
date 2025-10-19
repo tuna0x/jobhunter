@@ -37,51 +37,54 @@ public class SkillController {
     public SkillController(SkillService skillService) {
         this.skillService = skillService;
     }
-
-    @GetMapping("/skills/{id}")
-    @ApiMessage("Get skill by id")
-    public ResponseEntity<Skill> geSkillById(@PathVariable long id) {
-        Skill skillFound = this.skillService.handleGetSkillById(id);
-        if (skillFound == null) {
-            return ResponseEntity.badRequest().body(null);
+  @PostMapping("/skills")
+    @ApiMessage("Create a new skill")
+    public ResponseEntity<Skill> createSkill(@Valid @RequestBody Skill skillInput) throws IdInvalidException {
+        // check name
+        if (skillInput.getName() != null && this.skillService.isNameExist(skillInput.getName())) {
+            throw new IdInvalidException("Skill " + skillInput.getName() + " is exist, please input another skill !");
         }
-        return ResponseEntity.ok().body(skillFound);
-    }
-
-    @GetMapping("/skills")
-    @ApiMessage("Get all skills")
-    public ResponseEntity<ResultPaginationDTO> getAllSkills(@Filter Specification<Skill> spec, Pageable pageable) {
-        return ResponseEntity.ok(this.skillService.handleGetAllSkillWithPaginate(spec, pageable));
-    }
-
-    @PostMapping("/skills")
-    public ResponseEntity<Skill> postCreateSkill(@Valid @RequestBody Skill skill) throws IdInvalidException {
-        // TODO: process POST request
-        if (skill.getName() != null && this.skillService.isNameExist(skill.getName())) {
-            throw new IdInvalidException("SKill " + skill.getName() + " is already exists");
-        }
-        Skill skillCreated = this.skillService.handleCreateSkill(skill);
-        return ResponseEntity.ok().body(skillCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.skillService.handleCreateSkill(skillInput));
     }
 
     @PutMapping("/skills")
-    public ResponseEntity<Skill> putUpdateSkill(@Valid @RequestBody Skill skill) throws IdInvalidException {
-        // TODO: process PUT request
-        if (skill.getName() != null && this.skillService.isNameExist(skill.getName())) {
-            throw new IdInvalidException("SKill " + skill.getName() + " is already exists");
+    @ApiMessage("Update a skill")
+    public ResponseEntity<Skill> updateSkill(@Valid @RequestBody Skill skillInput) throws IdInvalidException {
+        // Check id
+        Skill currentSkill = this.skillService.fetchSkillById(skillInput.getId());
+        if (currentSkill == null) {
+            throw new IdInvalidException("Skill with Id: " + skillInput.getId() + " is not exist !");
         }
-        Skill skillUpdated = this.skillService.handleUpdateSkill(skill);
-        return ResponseEntity.ok().body(skillUpdated);
+
+        // check name
+        if (skillInput.getName() != null && this.skillService.isNameExist(skillInput.getName())) {
+            throw new IdInvalidException("Skill " + skillInput.getName() + " is exist, please input another skill !");
+        }
+        currentSkill.setName(skillInput.getName());
+        return ResponseEntity.ok().body(this.skillService.handleUpdateSkill(currentSkill));
+    }
+
+    @GetMapping("/skills")
+    @ApiMessage("Fetch all skill")
+    public ResponseEntity<ResultPaginationDTO> getAllSkill(
+            @Filter Specification<Skill> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.skillService.handleGetAllSkill(spec, pageable));
     }
 
     @DeleteMapping("/skills/{id}")
-    @ApiMessage("delete skill")
-    public ResponseEntity<Void> deleteSkill(@PathVariable long id) throws IdInvalidException {
-        if (this.skillService.handleGetSkillById(id) == null) {
-            throw new IdInvalidException("Cannot delete skill with id = " + id + " because it's not exists.");
+    @ApiMessage("Delete a skill")
+    public ResponseEntity<Void> deleteSkill(@PathVariable("id") long id) throws IdInvalidException {
+        // Check id
+        Skill currentSkill = this.skillService.fetchSkillById(id);
+        if (currentSkill == null) {
+            throw new IdInvalidException("Skill with Id: " + id + " is not exist !");
         }
-        this.skillService.handleDeleteSkill(id);
+
+        this.skillService.deleteSkill(id);
         return ResponseEntity.ok().body(null);
+
     }
+
 
 }

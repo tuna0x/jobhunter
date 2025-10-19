@@ -62,7 +62,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
     RestLoginDTO res=new RestLoginDTO();
-        User curUserDB=this.userService.handleGetUserByUsername(loginDTO.getUsername());
+        User curUserDB=this.userService.handleGetUserByUserName(loginDTO.getUsername());
         if (curUserDB!=null) {
             RestLoginDTO.UserLogin userLogin=new RestLoginDTO.UserLogin(
                 curUserDB.getId(),
@@ -101,7 +101,7 @@ public class AuthController {
     @ApiMessage("Fetch account")
     public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
         String email=SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        User curUser=this.userService.handleGetUserByUsername(email);
+            User curUser=this.userService.handleGetUserByUserName(email);
          RestLoginDTO.UserLogin userLogin=new RestLoginDTO.UserLogin();
          RestLoginDTO.UserGetAccount userGetAccount=new RestLoginDTO.UserGetAccount();
 
@@ -135,7 +135,7 @@ public class AuthController {
 
         // issue new token/ set refresh token as cookies
         RestLoginDTO res=new RestLoginDTO();
-        User curUserDB=this.userService.handleGetUserByUsername(email);
+        User curUserDB=this.userService.handleGetUserByUserName(email);
         if (curUserDB!=null) {
             RestLoginDTO.UserLogin userLogin=new RestLoginDTO.UserLogin(
                 curUserDB.getId(),
@@ -175,7 +175,8 @@ public class AuthController {
         }
         this.userService.updateUserToken(null, email);
 
-        ResponseCookie deletResponseCookie =ResponseCookie.from(email, null)
+        ResponseCookie deletResponseCookie =ResponseCookie
+        .from("refresh_token", email)
         .httpOnly(true)
         .secure(true)
         .path("/")
@@ -197,7 +198,7 @@ public class AuthController {
         String hashPassWord =this.passwordEncoder.encode(user.getPassword());
         user.setPassword(hashPassWord);
         User cur=this.userService.handleCreateUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreatedUserDTO(cur));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.ConvertToResCreateDTO(cur));
     }
 
 

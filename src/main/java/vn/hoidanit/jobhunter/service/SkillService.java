@@ -19,56 +19,48 @@ public class SkillService {
         this.skillRepository = skillRepository;
     }
 
+   public Skill handleCreateSkill(Skill skill) {
+        return this.skillRepository.save(skill);
+    }
+
     public boolean isNameExist(String name) {
         return this.skillRepository.existsByName(name);
     }
 
-    public Skill handleCreateSkill(Skill skill) {
-        return this.skillRepository.save(skill);
-    }
-
-    public Skill handleGetSkillById(long id) {
-        Optional<Skill> skill = this.skillRepository.findById(id);
-        return skill.isPresent() ? skill.get() : null;
-    }
-
-    public ResultPaginationDTO handleGetAllSkillWithPaginate(Specification<Skill> spec, Pageable pageable) {
-        // Page<Company> pageCompany = this.companyRepository.findAll(pageable);
-        Page<Skill> pageCompany = this.skillRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
-
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
-
-        metaData.setPages(pageCompany.getTotalPages());
-        metaData.setTotal(pageCompany.getTotalElements());
-
-        rs.setMeta(metaData);
-        rs.setData(pageCompany.getContent());
-
-        return rs;
-    }
-
-    public Skill handleUpdateSkill(Skill skill) {
-        Skill skillToUpdate = this.handleGetSkillById(skill.getId());
-        if (skillToUpdate != null) {
-            skillToUpdate.setName(skill.getName());
-            return this.skillRepository.save(skillToUpdate);
+    public Skill fetchSkillById(Long id) {
+        Optional<Skill> skillOptional = this.skillRepository.findById(id);
+        if (skillOptional.isPresent()) {
+            return skillOptional.get();
         }
         return null;
     }
 
-    public void handleDeleteSkill(long id) {
-        // xoa het data trong job_skill (vi trong entity Skill dc dinh nghia mappedBy
-        // nen ko tu dong xoa data bang join dc)
-        Optional<Skill> skillOptional = this.skillRepository.findById(id);
-        Skill currentSkill = skillOptional.get();
-        currentSkill.getJobs().forEach(job -> job.getSkills().remove(currentSkill));// xoa di skill tuong ung trong
-                                                                                    // job(job chua list gom nhieu
-                                                                                    // skill khac nhau)
+    public Skill handleUpdateSkill(Skill skill) {
+        return this.skillRepository.save(skill);
+    }
 
-        // xoa entity skill trong db
+    public ResultPaginationDTO handleGetAllSkill(Specification<Skill> spec, Pageable pageable) {
+        Page<Skill> pageSkill = this.skillRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageSkill.getNumber() + 1);
+        meta.setPageSize(pageSkill.getSize());
+        meta.setPages(pageSkill.getTotalPages());
+        meta.setTotal(pageSkill.getTotalElements());
+
+        resultPaginationDTO.setMeta(meta);
+
+        resultPaginationDTO.setResult(pageSkill.getContent());
+
+        return resultPaginationDTO;
+    }
+
+    public void deleteSkill(Long id) {
+        // delete job
+        Optional<Skill> optSkill = this.skillRepository.findById(id);
+        Skill currentSkill = optSkill.get();
+        currentSkill.getJobs().forEach(job -> job.getSkills().remove(currentSkill));
+        // delete skill
         this.skillRepository.delete(currentSkill);
     }
 }

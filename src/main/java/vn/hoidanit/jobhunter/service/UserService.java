@@ -31,162 +31,172 @@ public class UserService {
         this.roleService=roleService;
     }
 
-    public List<User> handleFetchAllUsers() {
-        return userRepository.findAll();
-    }
+     public User handleCreateUser(User user) {
+        // Check exist company
+        if (user.getCompany() != null) {
+            Optional<Company> optCompany = this.companyService.fetchById(
+                    user.getCompany().getId());
+            user.setCompany(optCompany.isPresent() ? optCompany.get() : null);
+        }
 
-    public ResultPaginationDTO handleGetAllUsersWithPaginate(Specification<User> spec, Pageable pageable) {
-        // Page<Company> pageCompany = this.companyRepository.findAll(pageable);
-        Page<User> pageUsers = this.userRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
+        // Check exist role
+        if (user.getRole() != null) {
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(r);
+        }
 
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
-
-        metaData.setPages(pageUsers.getTotalPages());
-        metaData.setTotal(pageUsers.getTotalElements());
-
-        rs.setMeta(metaData);
-
-        List<ResUserDTO> listUserDTOs = pageUsers.getContent().stream().map(
-            item->this.convertResGetUserDTO(item))
-                .collect(Collectors.toList());
-        rs.setData(listUserDTOs);
-        return rs;
-    }
-
-    public User handleFetchUserByID(long id) {
-        Optional<User> userOptional = this.userRepository.findById(id);
-        return userOptional.isPresent() ? userOptional.get() : null;
-    }
-
-    public User handleGetUserByUsername(String email) {
-        User userOptional = this.userRepository.findByEmail(email);
-        return userOptional;
+        return this.userRepository.save(user);
     }
 
     public boolean isEmailExist(String email) {
         return this.userRepository.existsByEmail(email);
     }
 
-    public User handleCreateUser(User user) {
-        boolean isExist = this.userRepository.existsByEmail(user.getEmail());
-        //check company
+    public ResCreateUserDTO ConvertToResCreateDTO(User user) {
+        ResCreateUserDTO resCreateUserDTO = new ResCreateUserDTO();
+        ResCreateUserDTO.CompanyUser resCompany = new ResCreateUserDTO.CompanyUser();
+        resCreateUserDTO.setId(user.getId());
+        resCreateUserDTO.setName(user.getName());
+        resCreateUserDTO.setEmail(user.getEmail());
+        resCreateUserDTO.setAge(user.getAge());
+        resCreateUserDTO.setGender(user.getGender());
+        resCreateUserDTO.setAddress(user.getAddress());
+        resCreateUserDTO.setCreatedAt(user.getCreatedAt());
+        // check company
         if (user.getCompany() != null) {
-            Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
-            user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
-        }
-        //check role
-        if (user.getRole() != null) {
-            Role role=this.roleService.getById(user.getRole().getId());
-            user.setRole(role!=null ? role : null);
+            resCompany.setId(user.getCompany().getId());
+            resCompany.setName(user.getCompany().getName());
+            resCreateUserDTO.setCompany(resCompany);
         }
 
-        return this.userRepository.save(user);
+        return resCreateUserDTO;
     }
 
-    public User handleUpdateUser(User user) {
-        User userToUpdate = handleFetchUserByID(user.getId());
-        if (userToUpdate != null) {
-            userToUpdate.setName(user.getName());
-            userToUpdate.setAddress(user.getAddress());
-            userToUpdate.setAge(user.getAge());
-            userToUpdate.setGender(user.getGender());
+    public ResUserDTO ConvertToResUserDTO(User user) {
+        ResUserDTO resUserDTO = new ResUserDTO();
+        ResUserDTO.CompanyUser resCompany = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser resUser = new ResUserDTO.RoleUser();
 
-            //check company
-            if (user.getCompany() != null) {
-                Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
-                userToUpdate.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        resUserDTO.setId(user.getId());
+        resUserDTO.setName(user.getName());
+        resUserDTO.setEmail(user.getEmail());
+        resUserDTO.setAge(user.getAge());
+        resUserDTO.setGender(user.getGender());
+        resUserDTO.setAddress(user.getAddress());
+        resUserDTO.setCreatedAt(user.getCreatedAt());
+        resUserDTO.setUpdatedAt(user.getUpdatedAt());
 
-                //check role
-            if (user.getRole()!=null) {
-            Role role=this.roleService.getById(user.getRole().getId());
-            userToUpdate.setRole(role!=null ? role : null);
-        }
-            }
-
-            return this.userRepository.save(userToUpdate);
+        // check company
+        if (user.getCompany() != null) {
+            resCompany.setId(user.getCompany().getId());
+            resCompany.setName(user.getCompany().getName());
+            resUserDTO.setCompany(resCompany);
         }
 
+        // check role
+        if (user.getRole() != null) {
+            resUser.setId(user.getRole().getId());
+            resUser.setName(user.getRole().getName());
+            resUserDTO.setRole(resUser);
+        }
+
+        return resUserDTO;
+    }
+
+    public ResultPaginationDTO handleGetAllUser(Specification<User> spec, Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageUser.getNumber() + 1);
+        meta.setPageSize(pageUser.getSize());
+        meta.setPages(pageUser.getTotalPages());
+        meta.setTotal(pageUser.getTotalElements());
+
+        resultPaginationDTO.setMeta(meta);
+
+        // Remove sensitive data
+        List<ResUserDTO> listUser = pageUser.getContent()
+                .stream().map(item -> this.ConvertToResUserDTO(item))
+                .collect(Collectors.toList());
+
+        resultPaginationDTO.setResult(listUser);
+
+        return resultPaginationDTO;
+    }
+
+    public User fetchUserById(Long id) {
+        Optional<User> userOptional = this.userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        }
         return null;
     }
 
-    public void handleDeleteUser(long id) {
+    public User handleUpdateUser(User userInput) {
+        User currentUser = this.fetchUserById(userInput.getId());
+
+        if (currentUser != null) {
+            currentUser.setName(userInput.getName());
+            currentUser.setAddress(userInput.getAddress());
+            currentUser.setGender(userInput.getGender());
+            currentUser.setAge(userInput.getAge());
+
+            // Check company
+            if (userInput.getCompany() != null) {
+                Optional<Company> optCompany = this.companyService.findCompanyById(
+                        userInput.getCompany().getId());
+                currentUser.setCompany(optCompany.isPresent() ? optCompany.get() : null);
+            }
+            // Check exist role
+            if (userInput.getRole() != null) {
+                Role r = this.roleService.fetchById(userInput.getRole().getId());
+                currentUser.setRole(r);
+            }
+            currentUser = this.userRepository.save(currentUser);
+            return currentUser;
+        }
+        return null;
+    }
+
+    public ResUpdateUserDTO ConvertToResUpdateUserDTO(User user) {
+        ResUpdateUserDTO resUserDTO = new ResUpdateUserDTO();
+        ResUpdateUserDTO.CompanyUser resCompany = new ResUpdateUserDTO.CompanyUser();
+        ResUpdateUserDTO.RoleUser resUser = new ResUpdateUserDTO.RoleUser();
+
+        resUserDTO.setId(user.getId());
+        resUserDTO.setName(user.getName());
+        resUserDTO.setAge(user.getAge());
+        resUserDTO.setGender(user.getGender());
+        resUserDTO.setAddress(user.getAddress());
+        resUserDTO.setUpdatedAt(user.getUpdatedAt());
+
+        // check company
+        if (user.getCompany() != null) {
+            resCompany.setId(user.getCompany().getId());
+            resCompany.setName(user.getCompany().getName());
+            resUserDTO.setCompany(resCompany);
+        }
+
+        // check role
+        if (user.getRole() != null) {
+            resUser.setId(user.getRole().getId());
+            resUser.setName(user.getRole().getName());
+            resUserDTO.setRole(resUser);
+        }
+
+        return resUserDTO;
+    }
+
+    public void handleDeleteUser(Long id) {
         this.userRepository.deleteById(id);
     }
 
-    public ResCreateUserDTO convertToResCreatedUserDTO(User user) {
-        ResCreateUserDTO resUserDTO = new ResCreateUserDTO();
-        ResCreateUserDTO.CompanyUser resCom = new ResCreateUserDTO.CompanyUser();
-
-        resUserDTO.setId(user.getId());
-        resUserDTO.setName(user.getName());
-        resUserDTO.setEmail(user.getEmail());
-        resUserDTO.setAddress(user.getAddress());
-        resUserDTO.setAge(user.getAge());
-        resUserDTO.setGender(user.getGender());
-        resUserDTO.setCreatedAt(user.getCreatedAt());
-
-        if (user.getCompany() != null) {
-            resCom.setId(user.getCompany().getId());
-            resCom.setName(user.getCompany().getName());
-            resUserDTO.setCompany(resCom);
-        }
-
-        return resUserDTO;
-    }
-
-    public ResUpdateUserDTO convertResUpdatedUserDTO(User user) {
-        ResUpdateUserDTO resUserDTO = new ResUpdateUserDTO();
-        ResUpdateUserDTO.CompanyUser resCom = new ResUpdateUserDTO.CompanyUser();
-
-        if (user.getCompany() != null) {
-            resCom.setId(user.getCompany().getId());
-            resCom.setName(user.getCompany().getName());
-            resUserDTO.setCompany(resCom);
-        }
-        resUserDTO.setId(user.getId());
-        resUserDTO.setName(user.getName());
-        resUserDTO.setEmail(user.getEmail());
-        resUserDTO.setAddress(user.getAddress());
-        resUserDTO.setAge(user.getAge());
-        resUserDTO.setGender(user.getGender());
-        resUserDTO.setUpdatedAt(user.getUpdatedAt());
-
-        return resUserDTO;
-    }
-
-    public ResUserDTO convertResGetUserDTO(User user) {
-        ResUserDTO resUserDTO = new ResUserDTO();
-        ResUserDTO.CompanyUser resCom = new ResUserDTO.CompanyUser();
-        ResUserDTO.RoleUser roleUser=new ResUserDTO.RoleUser();
-
-        if (user.getCompany() != null) {
-            resCom.setId(user.getCompany().getId());
-            resCom.setName(user.getCompany().getName());
-            resUserDTO.setCompany(resCom);
-        }
-
-        if (user.getRole()!=null) {
-            roleUser.setId(user.getRole().getId());
-            roleUser.setName(user.getRole().getName());
-            resUserDTO.setRole(roleUser);
-        }
-        resUserDTO.setId(user.getId());
-        resUserDTO.setName(user.getName());
-        resUserDTO.setEmail(user.getEmail());
-        resUserDTO.setAddress(user.getAddress());
-        resUserDTO.setAge(user.getAge());
-        resUserDTO.setGender(user.getGender());
-        resUserDTO.setUpdatedAt(user.getUpdatedAt());
-        resUserDTO.setCreatedAt(user.getCreatedAt());
-
-        return resUserDTO;
+    public User handleGetUserByUserName(String username) {
+        return this.userRepository.findByEmail(username);
     }
 
     public void updateUserToken(String token, String email) {
-        User currentUser = this.handleGetUserByUsername(email);
+        User currentUser = this.handleGetUserByUserName(email);
         if (currentUser != null) {
             currentUser.setRefreshToken(token);
             this.userRepository.save(currentUser);
@@ -194,7 +204,6 @@ public class UserService {
     }
 
     public User getUserByRefreshTokenAndEmail(String token, String email) {
-        User user = this.userRepository.findByRefreshTokenAndEmail(token, email);
-        return user;
+        return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
-}  
+}

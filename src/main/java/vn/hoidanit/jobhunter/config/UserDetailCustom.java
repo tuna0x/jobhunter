@@ -16,7 +16,7 @@ import vn.hoidanit.jobhunter.service.UserService;
 public class UserDetailCustom  implements UserDetailsService{
 
     private final UserService userService;
-    
+
     public UserDetailCustom(UserService userService) {
         this.userService = userService;
     }
@@ -24,7 +24,7 @@ public class UserDetailCustom  implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // TODO Auto-generated method stub
-        vn.hoidanit.jobhunter.domain.User user =this.userService.handleGetUserByUsername(username);
+        vn.hoidanit.jobhunter.domain.User user =this.userService.handleGetUserByUserName(username);
 
         if (user==null) {
             throw new UsernameNotFoundException("User not found");

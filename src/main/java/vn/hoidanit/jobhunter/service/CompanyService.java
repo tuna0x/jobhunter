@@ -29,59 +29,62 @@ public class CompanyService {
         return this.companyRepository.findAll();
     }
 
-    public ResultPaginationDTO handleGetAllCompaniesWithPaginate(Specification<Company> spec, Pageable pageable) {
-        // Page<Company> pageCompany = this.companyRepository.findAll(pageable);
-        Page<Company> pageCompany = this.companyRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs = new ResultPaginationDTO();
-        ResultPaginationDTO.Meta metaData = new ResultPaginationDTO.Meta();
-
-        metaData.setPage(pageable.getPageNumber() + 1);
-        metaData.setPageSize(pageable.getPageSize());
-
-        metaData.setPages(pageCompany.getTotalPages());
-        metaData.setTotal(pageCompany.getTotalElements());
-
-        rs.setMeta(metaData);
-        rs.setData(pageCompany.getContent());
-
-        return rs;
-    }
-
-
-    public Company handleGetCompanyByID(long id) {
-        Optional<Company> companyOptional = this.companyRepository.findById(id);
-        return companyOptional.isPresent() ? companyOptional.get() : null;
-    }
-
-    public Company handleCreateCompany(Company company) {
+   public Company handleCreateCompany(Company company) {
         return this.companyRepository.save(company);
     }
 
-    public Company handleUpdateCompany(Company company) {
-        Company companyToUpdate = this.handleGetCompanyByID(company.getId());
-        if (companyToUpdate != null) {
-            companyToUpdate.setAddress(company.getAddress());
-            companyToUpdate.setLogo(company.getLogo());
-            companyToUpdate.setName(company.getName());
-            companyToUpdate.setDescription(company.getDescription());
+    public ResultPaginationDTO handleGetAllCompanies(Specification<Company> spec, Pageable pageable) {
+        Page<Company> pageCompany = this.companyRepository.findAll(spec, pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageCompany.getNumber() + 1);
+        meta.setPageSize(pageCompany.getSize());
+        meta.setPages(pageCompany.getTotalPages());
+        meta.setTotal(pageCompany.getTotalElements());
 
-            return this.companyRepository.save(companyToUpdate);
+        resultPaginationDTO.setMeta(meta);
+        resultPaginationDTO.setResult(pageCompany.getContent());
+        return resultPaginationDTO;
+    }
+
+    public Company fetchCompanyById(Long id) {
+        Optional<Company> companyOptional = this.companyRepository.findById(id);
+        if (companyOptional.isPresent()) {
+            return companyOptional.get();
         }
         return null;
     }
 
-    public void handleDeleteCompany(long id) {
-        Optional<Company> comOptional = this.companyRepository.findById(id);
-        if (comOptional.isPresent()) {
-            Company com = comOptional.get();
-            // fetch all user belong to this company
+    public Optional<Company> findCompanyById(Long id) {
+        return this.companyRepository.findById(id);
+
+    }
+
+    public Company handleUpdateCompany(Company companyInput) {
+        Optional<Company> companyOptional = this.companyRepository.findById(companyInput.getId());
+        if (companyOptional.isPresent()) {
+            Company currentCompany = companyOptional.get();
+            currentCompany.setName(companyInput.getName());
+            currentCompany.setDescription(companyInput.getDescription());
+            currentCompany.setAddress(companyInput.getAddress());
+            currentCompany.setLogo(companyInput.getLogo());
+            return this.companyRepository.save(currentCompany);
+        }
+        return null;
+    }
+
+    public void handleDeleteCompany(Long id) {
+        Optional<Company> optCompany = this.companyRepository.findById(id);
+        if (optCompany.isPresent()) {
+            Company com = optCompany.get();
+            // fetch all user by company
             List<User> users = this.userRepository.findByCompany(com);
             this.userRepository.deleteAll(users);
         }
         this.companyRepository.deleteById(id);
     }
 
-    public Optional<Company> findById(long id) {
+    public Optional<Company> fetchById(long id) {
         return this.companyRepository.findById(id);
     }
 
