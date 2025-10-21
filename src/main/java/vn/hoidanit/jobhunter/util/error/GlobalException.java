@@ -27,8 +27,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> IdInvalidException(Exception ex) {
        RestResponse<Object> res=new RestResponse<Object>();
        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-       res.setError(ex.getMessage());
-       res.setMessage("Exception");
+       res.setError("Exception");
+       res.setMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(res);
     }
 
@@ -50,8 +50,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.NOT_FOUND.value());
-        res.setError(ex.getMessage());
-        res.setMessage("NOT FOUND RESOURCE");
+        res.setError("NOT FOUND RESOURCE");
+        res.setMessage(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
@@ -62,10 +62,20 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handleFileUploadException(Exception exception) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(exception.getMessage());
-        res.setMessage("Exception upload file");
+        res.setError("Exception upload file");
+        res.setMessage(exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+       @ExceptionHandler(value = { NoResourceFoundException.class })
+    public ResponseEntity<RestResponse<Object>> handlePermissionException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.NOT_FOUND.value());
+        res.setError("Forbidden");
+        res.setMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
 }

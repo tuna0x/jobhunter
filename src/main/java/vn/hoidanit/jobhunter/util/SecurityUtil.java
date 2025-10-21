@@ -71,6 +71,7 @@ public class SecurityUtil {
             .expiresAt(validity)
             .subject(email)
             .claim("user", userInsideToken)
+            .claim("permission", listAuthority)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

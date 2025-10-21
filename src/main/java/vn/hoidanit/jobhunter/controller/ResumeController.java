@@ -4,19 +4,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
+import com.turkraft.springfilter.builder.FilterBuilder;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
 
 import jakarta.validation.Valid;
+import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Resume;
+import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.response.resume.ResCreateResumeDTO;
 import vn.hoidanit.jobhunter.domain.response.resume.ResResumeDTO;
 import vn.hoidanit.jobhunter.domain.response.resume.ResUpdateResumeDTO;
 import vn.hoidanit.jobhunter.service.ResumeService;
+import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import java.lang.StackWalker.Option;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,8 +47,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ResumeController {
 
     private final ResumeService resumeService;
-    public ResumeController(ResumeService resumeService) {
+    private final UserService userService;
+    private FilterSpecificationConverter filterSpecificationConverter;
+    private FilterBuilder filterBuilder;
+    public ResumeController(ResumeService resumeService,UserService userService) {
         this.resumeService = resumeService;
+        this.userService=userService;
     }
 
    @PostMapping("/resumes")
@@ -92,11 +106,27 @@ public class ResumeController {
     }
 
     @GetMapping("/resumes")
-    @ApiMessage("Fetch all resumes")
+    @ApiMessage("Fetch all resume with paginate")
     public ResponseEntity<ResultPaginationDTO> fetchAll(
             @Filter Specification<Resume> spec,
             Pageable pageable) {
-        return ResponseEntity.ok().body(this.resumeService.fetchAll(spec, pageable));
+
+                List<Long> arrJobIds =null;
+                String email=SecurityUtil.getCurrentUserLogin().isPresent()==true ? SecurityUtil.getCurrentUserLogin().get() :"";
+                User curUser = this.userService.handleGetUserByUserName(email);
+                if (curUser != null) {
+                    Company company = curUser.getCompany();
+                    if (company != null) {
+                        List<Job> comJobs = company.getJobs();
+                        if (comJobs != null && comJobs.size() > 0) {
+                            arrJobIds = comJobs.stream().map(x-> x.getId()).collect(Collectors.toList());
+                        }
+                    }
+                }
+                Specification<Resume> jobInSpec=filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(arrJobIds)).get());
+
+                Specification<Resume> finalSpec = jobInSpec.and(jobInSpec);
+        return ResponseEntity.ok().body(this.resumeService.fetchAll(finalSpec, pageable));
     }
 
     @PostMapping("/resumes/by-user")
@@ -105,4 +135,5 @@ public class ResumeController {
             Pageable pageable) {
         return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
     }
+
 }
