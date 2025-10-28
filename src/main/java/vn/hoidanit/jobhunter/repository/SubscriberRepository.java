@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface SubscriberRepository extends JpaRepository<Subscriber,Long>,JpaSpecificationExecutor<Subscriber>{
 
-    boolean findByEmail(String email);
+    boolean existsByEmail(String email);
+    Subscriber findByEmail(String email);
 }

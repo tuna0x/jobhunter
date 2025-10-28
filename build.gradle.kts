@@ -23,15 +23,18 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation ("org.springframework.boot:spring-boot-starter")
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation ("mysql:mysql-connector-java:8.0.29")
     implementation("org.projectlombok:lombok:1.18.30")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.turkraft.springfilter:jpa:3.1.7")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     testImplementation("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
-
+  testImplementation ("org.springframework.boot:spring-boot-starter-test")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
