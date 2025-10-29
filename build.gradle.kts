@@ -29,6 +29,7 @@ dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation ("mysql:mysql-connector-java:8.0.29")
     implementation("org.projectlombok:lombok:1.18.30")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.turkraft.springfilter:jpa:3.1.7")
     annotationProcessor("org.projectlombok:lombok:1.18.30")

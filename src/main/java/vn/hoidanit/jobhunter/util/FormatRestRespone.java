@@ -26,9 +26,9 @@ public class FormatRestRespone implements ResponseBodyAdvice<Object>{
     @Nullable
     public Object beforeBodyWrite(
             @Nullable Object body,
-            MethodParameter returnType, 
+            MethodParameter returnType,
             MediaType selectedContentType,
-            Class selectedConverterType, 
+            Class selectedConverterType,
             ServerHttpRequest request,
             ServerHttpResponse response) {
         // TODO Auto-generated method stub
@@ -37,9 +37,15 @@ public class FormatRestRespone implements ResponseBodyAdvice<Object>{
         RestResponse<Object> res=new RestResponse<Object>();
         res.setStatusCode(status);
 
+        String path = request.getURI().getPath();
+            if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")) {
+                return body;
+            }
+
+
         if (body instanceof String || body instanceof Resource) {
             return body;
-            
+
         }
         if (status >=400) {
             //case err
@@ -51,5 +57,5 @@ public class FormatRestRespone implements ResponseBodyAdvice<Object>{
         }
                 return res;
     }
-    
+
 }
