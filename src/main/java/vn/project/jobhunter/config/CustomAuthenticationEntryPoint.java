@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.config;
+package vn.project.jobhunter.config;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import vn.hoidanit.jobhunter.domain.response.RestResponse;
+import vn.project.jobhunter.domain.response.RestResponse;
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
      private final AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();

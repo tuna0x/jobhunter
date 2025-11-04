@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.project.jobhunter.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,17 +17,17 @@ import com.turkraft.springfilter.parser.FilterParser;
 import com.turkraft.springfilter.parser.node.FilterNode;
 
 import jakarta.validation.Valid;
-import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.Resume;
-import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.domain.response.resume.ResCreateResumeDTO;
-import vn.hoidanit.jobhunter.domain.response.resume.ResResumeDTO;
-import vn.hoidanit.jobhunter.domain.response.resume.ResUpdateResumeDTO;
-import vn.hoidanit.jobhunter.repository.JobRepository;
-import vn.hoidanit.jobhunter.repository.ResumeRepository;
-import vn.hoidanit.jobhunter.repository.UserRepository;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
+import vn.project.jobhunter.domain.Job;
+import vn.project.jobhunter.domain.Resume;
+import vn.project.jobhunter.domain.User;
+import vn.project.jobhunter.domain.response.ResultPaginationDTO;
+import vn.project.jobhunter.domain.response.resume.ResCreateResumeDTO;
+import vn.project.jobhunter.domain.response.resume.ResResumeDTO;
+import vn.project.jobhunter.domain.response.resume.ResUpdateResumeDTO;
+import vn.project.jobhunter.repository.JobRepository;
+import vn.project.jobhunter.repository.ResumeRepository;
+import vn.project.jobhunter.repository.UserRepository;
+import vn.project.jobhunter.util.SecurityUtil;
 
 @Service
 public class ResumeService {

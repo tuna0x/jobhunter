@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain.email;
+package vn.project.jobhunter.domain.email;
 
 import java.util.List;
 

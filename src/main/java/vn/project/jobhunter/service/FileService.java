@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.project.jobhunter.service;
 
 import java.io.File;
 import java.io.FileInputStream;

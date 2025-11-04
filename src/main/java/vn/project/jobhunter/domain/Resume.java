@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain;
+package vn.project.jobhunter.domain;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,8 +19,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
-import vn.hoidanit.jobhunter.util.constant.ResumeEnum;
+import vn.project.jobhunter.util.SecurityUtil;
+import vn.project.jobhunter.util.constant.ResumeEnum;
 
 @Entity
 @Getter

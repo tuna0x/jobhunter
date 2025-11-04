@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.project.jobhunter.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,14 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.Role;
-import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
-import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
-import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.repository.UserRepository;
+import vn.project.jobhunter.domain.Company;
+import vn.project.jobhunter.domain.Role;
+import vn.project.jobhunter.domain.User;
+import vn.project.jobhunter.domain.response.ResCreateUserDTO;
+import vn.project.jobhunter.domain.response.ResUpdateUserDTO;
+import vn.project.jobhunter.domain.response.ResUserDTO;
+import vn.project.jobhunter.domain.response.ResultPaginationDTO;
+import vn.project.jobhunter.repository.UserRepository;
 
 @Service
 

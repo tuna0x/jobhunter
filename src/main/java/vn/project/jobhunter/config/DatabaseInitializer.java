@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.config;
+package vn.project.jobhunter.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,13 +7,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import vn.hoidanit.jobhunter.domain.Permission;
-import vn.hoidanit.jobhunter.domain.Role;
-import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.repository.PermissionRepository;
-import vn.hoidanit.jobhunter.repository.RoleRepository;
-import vn.hoidanit.jobhunter.repository.UserRepository;
-import vn.hoidanit.jobhunter.util.constant.GenderEnum;
+import vn.project.jobhunter.domain.Permission;
+import vn.project.jobhunter.domain.Role;
+import vn.project.jobhunter.domain.User;
+import vn.project.jobhunter.repository.PermissionRepository;
+import vn.project.jobhunter.repository.RoleRepository;
+import vn.project.jobhunter.repository.UserRepository;
+import vn.project.jobhunter.util.constant.GenderEnum;
 
 @Service
 public class DatabaseInitializer implements CommandLineRunner{

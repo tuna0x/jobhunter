@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain.response;
+package vn.project.jobhunter.domain.response;
 
 import java.time.Instant;
 
@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.domain.response.ResUserDTO.RoleUser;
-import vn.hoidanit.jobhunter.util.constant.GenderEnum;
+import vn.project.jobhunter.domain.response.ResUserDTO.RoleUser;
+import vn.project.jobhunter.util.constant.GenderEnum;
 
 @Getter
 @Setter

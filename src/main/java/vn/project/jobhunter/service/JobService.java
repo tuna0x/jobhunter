@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.project.jobhunter.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,15 +10,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.Skill;
-import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.domain.response.job.ResCreateJobDTO;
-import vn.hoidanit.jobhunter.domain.response.job.ResUpdateJobDTO;
-import vn.hoidanit.jobhunter.repository.CompanyRepository;
-import vn.hoidanit.jobhunter.repository.JobRepository;
-import vn.hoidanit.jobhunter.repository.SkillRepository;
+import vn.project.jobhunter.domain.Company;
+import vn.project.jobhunter.domain.Job;
+import vn.project.jobhunter.domain.Skill;
+import vn.project.jobhunter.domain.response.ResultPaginationDTO;
+import vn.project.jobhunter.domain.response.job.ResCreateJobDTO;
+import vn.project.jobhunter.domain.response.job.ResUpdateJobDTO;
+import vn.project.jobhunter.repository.CompanyRepository;
+import vn.project.jobhunter.repository.JobRepository;
+import vn.project.jobhunter.repository.SkillRepository;
 
 @Service
 public class JobService {

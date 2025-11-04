@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain;
+package vn.project.jobhunter.domain;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
+import vn.project.jobhunter.util.SecurityUtil;
 
 @Entity
 @Table(name = "companies")

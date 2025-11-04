@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain.file;
+package vn.project.jobhunter.domain.file;
 
 import java.time.Instant;
 

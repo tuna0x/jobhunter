@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain.response.resume;
+package vn.project.jobhunter.domain.response.resume;
 
 import java.time.Instant;
 
@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.util.constant.ResumeEnum;
+import vn.project.jobhunter.util.constant.ResumeEnum;
 
 @Getter
 @Setter

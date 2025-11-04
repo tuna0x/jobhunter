@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.util;
+package vn.project.jobhunter.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
-import vn.hoidanit.jobhunter.domain.response.RestLoginDTO;
-import vn.hoidanit.jobhunter.domain.response.RestLoginDTO.UserInsideToken;
+import vn.project.jobhunter.domain.response.RestLoginDTO;
+import vn.project.jobhunter.domain.response.RestLoginDTO.UserInsideToken;
 
 
 @Service

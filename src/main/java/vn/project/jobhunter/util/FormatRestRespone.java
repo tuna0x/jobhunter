@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.util;
+package vn.project.jobhunter.util;
 
 import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Resource;
 import org.springframework.core.MethodParameter;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
-import vn.hoidanit.jobhunter.domain.response.RestResponse;
+import vn.project.jobhunter.domain.response.RestResponse;
 
 @ControllerAdvice
 public class FormatRestRespone implements ResponseBodyAdvice<Object>{

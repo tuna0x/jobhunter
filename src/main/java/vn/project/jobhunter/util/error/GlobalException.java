@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.util.error;
+package vn.project.jobhunter.util.error;
 
 import java.util.List;
 import java.util.stream.Collector;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import vn.hoidanit.jobhunter.domain.response.RestResponse;
+import vn.project.jobhunter.domain.response.RestResponse;
 
 @RestControllerAdvice
 public class GlobalException {

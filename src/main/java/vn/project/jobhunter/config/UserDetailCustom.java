@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.config;
+package vn.project.jobhunter.config;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import vn.hoidanit.jobhunter.service.UserService;
+import vn.project.jobhunter.service.UserService;
 
 @Component("userDetailsService")
 public class UserDetailCustom  implements UserDetailsService{
@@ -24,7 +24,7 @@ public class UserDetailCustom  implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // TODO Auto-generated method stub
-        vn.hoidanit.jobhunter.domain.User user =this.userService.handleGetUserByUserName(username);
+        vn.project.jobhunter.domain.User user =this.userService.handleGetUserByUserName(username);
 
         if (user==null) {
             throw new UsernameNotFoundException("User not found");

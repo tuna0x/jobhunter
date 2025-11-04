@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.controller;
+package vn.project.jobhunter.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import vn.hoidanit.jobhunter.domain.Subscriber;
-import vn.hoidanit.jobhunter.service.SubscriberService;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
-import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
-import vn.hoidanit.jobhunter.util.error.IdInvalidException;
+import vn.project.jobhunter.domain.Subscriber;
+import vn.project.jobhunter.service.SubscriberService;
+import vn.project.jobhunter.util.SecurityUtil;
+import vn.project.jobhunter.util.anotation.ApiMessage;
+import vn.project.jobhunter.util.error.IdInvalidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;

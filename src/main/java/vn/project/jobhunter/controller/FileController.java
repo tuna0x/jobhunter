@@ -1,13 +1,13 @@
-package vn.hoidanit.jobhunter.controller;
+package vn.project.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
-import vn.hoidanit.jobhunter.domain.file.ResUpLoadFileDTO;
-import vn.hoidanit.jobhunter.service.FileService;
-import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
-import vn.hoidanit.jobhunter.util.error.StorageException;
+import vn.project.jobhunter.domain.file.ResUpLoadFileDTO;
+import vn.project.jobhunter.service.FileService;
+import vn.project.jobhunter.util.anotation.ApiMessage;
+import vn.project.jobhunter.util.error.StorageException;
 
 import java.io.IOException;
 import java.net.URI;

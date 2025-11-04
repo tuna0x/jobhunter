@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.controller;
+package vn.project.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -6,13 +6,13 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.domain.response.job.ResCreateJobDTO;
-import vn.hoidanit.jobhunter.domain.response.job.ResUpdateJobDTO;
-import vn.hoidanit.jobhunter.service.JobService;
-import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
-import vn.hoidanit.jobhunter.util.error.IdInvalidException;
+import vn.project.jobhunter.domain.Job;
+import vn.project.jobhunter.domain.response.ResultPaginationDTO;
+import vn.project.jobhunter.domain.response.job.ResCreateJobDTO;
+import vn.project.jobhunter.domain.response.job.ResUpdateJobDTO;
+import vn.project.jobhunter.service.JobService;
+import vn.project.jobhunter.util.anotation.ApiMessage;
+import vn.project.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 

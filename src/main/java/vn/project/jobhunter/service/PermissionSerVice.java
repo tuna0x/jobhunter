@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.project.jobhunter.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +10,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
-import vn.hoidanit.jobhunter.domain.Permission;
-import vn.hoidanit.jobhunter.domain.Resume;
-import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.domain.response.resume.ResResumeDTO;
-import vn.hoidanit.jobhunter.repository.PermissionRepository;
+import vn.project.jobhunter.domain.Permission;
+import vn.project.jobhunter.domain.Resume;
+import vn.project.jobhunter.domain.response.ResultPaginationDTO;
+import vn.project.jobhunter.domain.response.resume.ResResumeDTO;
+import vn.project.jobhunter.repository.PermissionRepository;
 
 @Service
 public class PermissionSerVice {

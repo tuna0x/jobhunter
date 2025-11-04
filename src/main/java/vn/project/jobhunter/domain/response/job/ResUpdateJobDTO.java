@@ -1,11 +1,11 @@
-package vn.hoidanit.jobhunter.domain.response.job;
+package vn.project.jobhunter.domain.response.job;
 
 import java.time.Instant;
 import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.util.constant.LevelEnum;
+import vn.project.jobhunter.util.constant.LevelEnum;
 
 @Getter
 @Setter

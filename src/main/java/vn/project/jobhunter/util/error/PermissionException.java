@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.util.error;
+package vn.project.jobhunter.util.error;
 
 public class PermissionException extends Exception{
 

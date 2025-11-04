@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.controller;
+package vn.project.jobhunter.controller;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +14,14 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.request.ReqLoginDTO;
-import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.response.RestLoginDTO;
-import vn.hoidanit.jobhunter.service.UserService;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
-import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
-import vn.hoidanit.jobhunter.util.error.IdInvalidException;
+import vn.project.jobhunter.domain.User;
+import vn.project.jobhunter.domain.request.ReqLoginDTO;
+import vn.project.jobhunter.domain.response.ResCreateUserDTO;
+import vn.project.jobhunter.domain.response.RestLoginDTO;
+import vn.project.jobhunter.service.UserService;
+import vn.project.jobhunter.util.SecurityUtil;
+import vn.project.jobhunter.util.anotation.ApiMessage;
+import vn.project.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
