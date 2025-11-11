@@ -15,7 +15,7 @@ import vn.project.jobhunter.util.constant.LevelEnum;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResCreateJobDTO {
-    
+
     private Long id;
     private String name;
     private String location;

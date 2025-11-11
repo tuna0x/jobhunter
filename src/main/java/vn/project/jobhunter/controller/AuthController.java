@@ -142,6 +142,7 @@ public class AuthController {
                 curUserDB.getEmail(),
                 curUserDB.getName(),
                 curUserDB.getRole());
+                res.setUser(userLogin);
 
         }
            String access_token= this.securityUtil.createAccessToken(email,res);

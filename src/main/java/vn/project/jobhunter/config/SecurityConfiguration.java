@@ -46,8 +46,8 @@ public class SecurityConfiguration {
 
         String [] whiteList={
             "/",
-            "/api/v1/auth/login",
             "/api/v1/auth/refresh",
+            "/api/v1/auth/login",
             "/api/v1/auth/register",
             "/api/v1/email",
             "/storage/**",
@@ -70,10 +70,10 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                 .authenticationEntryPoint(customAuthenticationEntryPoint))
 
-            // .exceptionHandling(
-            //         exceptions -> exceptions
-            //                 .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //401
-            //                 .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
+            .exceptionHandling(
+                    exceptions -> exceptions
+                            .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //401
+                            .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
             .formLogin(f->f.disable())
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
